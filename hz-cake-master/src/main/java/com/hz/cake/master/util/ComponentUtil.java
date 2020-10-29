@@ -39,6 +39,7 @@ public class ComponentUtil {
     public static MobileCardHeartbeatService mobileCardHeartbeatService;
     public static IssueService issueService;
     public static MerchantChannelService merchantChannelService;
+    public static OrderOutService orderOutService;
 
 
 
