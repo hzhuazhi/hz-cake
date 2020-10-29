@@ -107,6 +107,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private IssueService issueService;
 
+    @Autowired
+    private MerchantChannelService merchantChannelService;
+
 
 
 
@@ -145,6 +148,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.shortChainService = shortChainService;
         ComponentUtil.mobileCardHeartbeatService = mobileCardHeartbeatService;
         ComponentUtil.issueService = issueService;
+        ComponentUtil.merchantChannelService = merchantChannelService;
 
         runThread = new RunThread();
         runThread.start();
