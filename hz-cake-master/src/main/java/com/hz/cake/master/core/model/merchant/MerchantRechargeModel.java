@@ -19,14 +19,14 @@ public class MerchantRechargeModel extends BasePage implements Serializable {
     private Long id;
 
     /**
-     * 归属的账号ID：对应表tb_hz_sys_account的主键ID，并且角色类型是卡商
+     * 归属的账号ID：对应表tb_fr_merchant的主键ID，并且角色类型是卡商
      */
-    private Long accountId;
+    private Long merchantId;
 
     /**
-     * 银行卡归属卡站点ID：对应表tb_hz_sys_account的主键ID，并且角色是卡站点
+     * 银行卡归属卡站点ID：对应表tb_fr_merchant_site的主键ID，并且角色是卡站点
      */
-    private Long cardSiteId;
+    private Long merchantSiteId;
 
     /**
      * 订单号
@@ -174,20 +174,12 @@ public class MerchantRechargeModel extends BasePage implements Serializable {
         this.id = id;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getMerchantSiteId() {
+        return merchantSiteId;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public Long getCardSiteId() {
-        return cardSiteId;
-    }
-
-    public void setCardSiteId(Long cardSiteId) {
-        this.cardSiteId = cardSiteId;
+    public void setMerchantSiteId(Long merchantSiteId) {
+        this.merchantSiteId = merchantSiteId;
     }
 
     public String getOrderNo() {
@@ -420,5 +412,13 @@ public class MerchantRechargeModel extends BasePage implements Serializable {
 
     public void setInvalidTimeStr(String invalidTimeStr) {
         this.invalidTimeStr = invalidTimeStr;
+    }
+
+    public Long getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(Long merchantId) {
+        this.merchantId = merchantId;
     }
 }

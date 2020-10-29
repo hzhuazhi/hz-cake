@@ -168,7 +168,7 @@ public class OrderController {
 //            HodgepodgeMethod.checkMerchantIsNull(merchantList);
 //
 //            // 获取卡商的主键ID集合
-//            List<Long> merchantIdList = merchantList.stream().map(MerchantModel::getAccountId).collect(Collectors.toList());
+//            List<Long> merchantIdList = merchantList.stream().map(MerchantModel::getMerchantId).collect(Collectors.toList());
 //
 //            // 获取目前正常使用的手机号
 //            MobileCardModel mobileCardQuery = HodgepodgeMethod.assembleMobileCardQuery(0, null, 1, 2, 1);

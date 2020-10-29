@@ -40,14 +40,14 @@ public class BankModel extends BasePage implements Serializable {
     private Long bankTypeId;
 
     /**
-     * 归属卡商ID：对应表tb_hz_sys_account的主键ID，并且角色是卡商
+     * 归属卡商ID：对应表tb_fr_merchant的主键ID，并且角色是卡商
      */
-    private Long accountId;
+    private Long merchantId;
 
     /**
-     * 银行卡归属卡站点ID：对应表tb_hz_sys_account的主键ID，并且角色是卡站点
+     * 银行卡归属卡站点ID：对应表tb_fr_merchant_site的主键ID，并且角色是卡站点
      */
-    private Long cardSiteId;
+    private Long merchantSiteId;
 
     /**
      * 银行名称/归属开户行
@@ -235,7 +235,7 @@ public class BankModel extends BasePage implements Serializable {
     /**
      * 卡商ID集合-SQL
      */
-    private List<Long> accountIdList;
+    private List<Long> merchantIdList;
 
     /**
      * 手机卡ID集合-SQL
@@ -298,12 +298,12 @@ public class BankModel extends BasePage implements Serializable {
         this.alias = alias;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getMerchantId() {
+        return merchantId;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setMerchantId(Long merchantId) {
+        this.merchantId = merchantId;
     }
 
     public Long getBankTypeId() {
@@ -587,12 +587,12 @@ public class BankModel extends BasePage implements Serializable {
         this.cardInDayNum = cardInDayNum;
     }
 
-    public List<Long> getAccountIdList() {
-        return accountIdList;
+    public List<Long> getMerchantIdList() {
+        return merchantIdList;
     }
 
-    public void setAccountIdList(List<Long> accountIdList) {
-        this.accountIdList = accountIdList;
+    public void setMerchantIdList(List<Long> merchantIdList) {
+        this.merchantIdList = merchantIdList;
     }
 
     public List<Long> getMobileCardIdList() {
@@ -668,12 +668,12 @@ public class BankModel extends BasePage implements Serializable {
     }
 
 
-    public Long getCardSiteId() {
-        return cardSiteId;
+    public Long getMerchantSiteId() {
+        return merchantSiteId;
     }
 
-    public void setCardSiteId(Long cardSiteId) {
-        this.cardSiteId = cardSiteId;
+    public void setMerchantSiteId(Long merchantSiteId) {
+        this.merchantSiteId = merchantSiteId;
     }
 
     public String getCardSiteName() {

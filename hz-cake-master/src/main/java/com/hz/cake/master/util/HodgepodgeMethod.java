@@ -558,12 +558,12 @@ public class HodgepodgeMethod {
         resBean.setBankCode(bankModel.getBankCode());
         resBean.setMobileCardId(bankModel.getMobileCardId());
         resBean.setPhoneNum(bankModel.getPhoneNum());
-        resBean.setAccountId(bankModel.getAccountId());
+        resBean.setMerchantId(bankModel.getMerchantId());
         if (!StringUtils.isBlank(bankModel.getAcName())){
             resBean.setMerchantName(bankModel.getAcName());
         }
-        if (bankModel.getCardSiteId() != null && bankModel.getCardSiteId() > 0){
-            resBean.setCardSiteId(bankModel.getCardSiteId());
+        if (bankModel.getMerchantSiteId() != null && bankModel.getMerchantSiteId() > 0){
+            resBean.setMerchantSiteId(bankModel.getMerchantSiteId());
         }
         if (!StringUtils.isBlank(bankModel.getCardSiteName())){
             resBean.setCardSiteName(bankModel.getCardSiteName());
@@ -1168,7 +1168,7 @@ public class HodgepodgeMethod {
     /**
      * @Description: 组装查询卡商充值的信息
      * @param id - 主键ID
-     * @param accountId - 归属的账号ID：对应表tb_hz_sys_account的主键ID，并且角色类型是卡商
+     * @param merchantId - 归属的账号ID：对应表tb_fr_merchant的主键ID，并且角色类型是卡商
      * @param orderNo - 订单号
      * @param orderType - 订单类型：1预付款订单，2平台发起订单，3下发订单
      * @param issueOrderNo - 下发表的订单号：对应表tb_fr_issue的order_no；也可以把它称之为关联订单号
@@ -1182,15 +1182,15 @@ public class HodgepodgeMethod {
      * @author yoko
      * @date 2020/9/23 17:16
      */
-    public static MerchantRechargeModel assembleMerchantRechargeQuery(long id, long accountId, String orderNo, int orderType, String issueOrderNo,
+    public static MerchantRechargeModel assembleMerchantRechargeQuery(long id, long merchantId, String orderNo, int orderType, String issueOrderNo,
                                                                       int orderStatus, int operateStatus,
                                                                        int isSynchro, int checkStatus, String checkInfo, String invalidTime){
         MerchantRechargeModel resBean = new MerchantRechargeModel();
         if (id > 0){
             resBean.setId(id);
         }
-        if (accountId > 0){
-            resBean.setAccountId(accountId);
+        if (merchantId > 0){
+            resBean.setMerchantId(merchantId);
         }
         if (!StringUtils.isBlank(orderNo)){
             resBean.setOrderNo(orderNo);

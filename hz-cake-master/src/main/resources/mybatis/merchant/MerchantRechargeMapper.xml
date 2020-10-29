@@ -7,7 +7,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.account_id,a.card_site_id,a.order_no,a.order_type,a.issue_order_no,a.order_money,a.order_status,
+        a.id,a.merchant_id,a.merchant_site_id,a.order_no,a.order_type,a.issue_order_no,a.order_money,a.order_status,
         a.bank_name,a.bank_card,a.account_name,a.picture_ads,a.operate_status,a.is_synchro,a.check_status,a.check_info,
         a.invalid_time,a.data_explain,
         a.remark,a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
@@ -21,8 +21,8 @@
             <if test="id != null and id != '' " >
                 and a.id = #{id}
             </if>
-            <if test="accountId != null and accountId != '' " >
-                and a.account_id = #{accountId}
+            <if test="merchantId != null and merchantId != '' " >
+                and a.merchant_id = #{merchantId}
             </if>
             <if test="orderNo != null and orderNo != '' " >
                 and a.order_no = #{orderNo}
@@ -141,11 +141,11 @@
         <!--</selectKey>-->
         insert into tb_fr_merchant_recharge
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="accountId != null and accountId != '' " >
-                account_id,
+            <if test="merchantId != null and merchantId != '' " >
+                merchant_id,
             </if>
-            <if test="cardSiteId != null and cardSiteId != '' " >
-                card_site_id,
+            <if test="merchantSiteId != null and merchantSiteId != '' " >
+                merchant_site_id,
             </if>
             <if test="orderNo != null and orderNo != '' " >
                 order_no,
@@ -208,11 +208,11 @@
         </trim>
         values
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="accountId != null and accountId != '' " >
-                <![CDATA[  #{accountId}, ]]>
+            <if test="merchantId != null and merchantId != '' " >
+                <![CDATA[  #{merchantId}, ]]>
             </if>
-            <if test="cardSiteId != null and cardSiteId != '' " >
-                <![CDATA[  #{cardSiteId}, ]]>
+            <if test="merchantSiteId != null and merchantSiteId != '' " >
+                <![CDATA[  #{merchantSiteId}, ]]>
             </if>
             <if test="orderNo != null and orderNo != '' " >
                 <![CDATA[  #{orderNo}, ]]>
@@ -279,11 +279,11 @@
     <update id="update" parameterType="com.hz.cake.master.core.model.merchant.MerchantRechargeModel">
         UPDATE tb_fr_merchant_recharge a
         <trim prefix="set" suffixOverrides=",">
-            <if test="accountId != null and accountId != '' " >
-                a.account_id = #{accountId},
+            <if test="merchantId != null and merchantId != '' " >
+                a.merchant_id = #{merchantId},
             </if>
-            <if test="cardSiteId != null and cardSiteId != '' " >
-                a.card_site_id = #{cardSiteId},
+            <if test="merchantSiteId != null and merchantSiteId != '' " >
+                a.merchant_site_id = #{merchantSiteId},
             </if>
             <if test="orderNo != null and orderNo != '' " >
                 a.order_no = #{orderNo},

@@ -117,7 +117,7 @@ public class MerchantModel extends BasePage implements Serializable {
     /**
      * 使用状态:1初始化有效正常使用，2无效暂停使用
      */
-    private String useStatus;
+    private Integer useStatus;
 
     /**
      * 创建人ID
@@ -319,13 +319,7 @@ public class MerchantModel extends BasePage implements Serializable {
         this.remark = remark;
     }
 
-    public String getUseStatus() {
-        return useStatus;
-    }
 
-    public void setUseStatus(String useStatus) {
-        this.useStatus = useStatus;
-    }
 
     public Long getCreateUserId() {
         return createUserId;
@@ -389,5 +383,13 @@ public class MerchantModel extends BasePage implements Serializable {
 
     public void setMoney(BigDecimal money) {
         this.money = money;
+    }
+
+    public Integer getUseStatus() {
+        return useStatus;
+    }
+
+    public void setUseStatus(Integer useStatus) {
+        this.useStatus = useStatus;
     }
 }

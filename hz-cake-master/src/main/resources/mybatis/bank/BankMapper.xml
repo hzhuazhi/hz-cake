@@ -7,7 +7,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.alias,a.mobile_card_id,a.bank_type_id,a.account_id,a.bank_name,a.bank_card,a.subbranch_name,a.account_name,a.bank_code,a.province,a.city,
+        a.id,a.alias,a.mobile_card_id,a.bank_type_id,a.merchant_id,a.bank_name,a.bank_card,a.subbranch_name,a.account_name,a.bank_code,a.province,a.city,
         a.sms_num,a.last_num,a.in_day_money,a.in_month_money,a.out_day_money,a.out_month_money,a.is_arrears,
         a.check_status,a.data_explain,a.is_ok,a.remark,a.use_status,
         a.create_time,a.update_time,a.yn
@@ -15,7 +15,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List_Two">
-        a.id,a.alias,a.mobile_card_id,a.bank_type_id,a.account_id,a.card_site_id,a.bank_name,a.bank_card,a.subbranch_name,a.account_name,a.bank_code,a.province,a.city,
+        a.id,a.alias,a.mobile_card_id,a.bank_type_id,a.merchant_id,a.merchant_site_id,a.bank_name,a.bank_card,a.subbranch_name,a.account_name,a.bank_code,a.province,a.city,
         a.sms_num,a.last_num,a.in_day_money,a.in_month_money,a.out_day_money,a.out_month_money,a.is_arrears,
         a.check_status,a.data_explain,a.is_ok,a.remark,a.use_status,
         a.create_time,a.update_time,a.yn,
@@ -39,8 +39,8 @@
             <if test="bankTypeId != null and bankTypeId != '' " >
                 and a.bank_type_id = #{bankTypeId}
             </if>
-            <if test="accountId != null and accountId != '' " >
-                and a.account_id = #{accountId}
+            <if test="merchantId != null and merchantId != '' " >
+                and a.merchant_id = #{merchantId}
             </if>
             <if test="bankCard != null and bankCard != '' " >
                 and a.bank_card = #{bankCard}
@@ -69,9 +69,9 @@
     <sql id="Example_Where_Clause_Two">
         where 1=1
         <trim  suffixOverrides="," >
-            <if test="accountIdList != null and accountIdList.size()>0">
-                and a.account_id in
-                <foreach item="item" index="index" collection="accountIdList" open="(" separator="," close=")">
+            <if test="merchantIdList != null and merchantIdList.size()>0">
+                and a.merchant_id in
+                <foreach item="item" index="index" collection="merchantIdList" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
@@ -203,8 +203,8 @@
             <if test="bankTypeId != null and bankTypeId != '' " >
                 bank_type_id,
             </if>
-            <if test="accountId != null and accountId != '' " >
-                account_id,
+            <if test="merchantId != null and merchantId != '' " >
+                merchant_id,
             </if>
             <if test="bankName != null and bankName != '' " >
                 bank_name,
@@ -276,8 +276,8 @@
             <if test="bankTypeId != null and bankTypeId != '' " >
                 <![CDATA[  #{bankTypeId}, ]]>
             </if>
-            <if test="accountId != null and accountId != '' " >
-                <![CDATA[  #{accountId}, ]]>
+            <if test="merchantId != null and merchantId != '' " >
+                <![CDATA[  #{merchantId}, ]]>
             </if>
             <if test="bankName != null and bankName != '' " >
                 <![CDATA[  #{bankName}, ]]>
@@ -353,8 +353,8 @@
             <if test="bankTypeId != null and bankTypeId != '' " >
                 a.bank_type_id = #{bankTypeId},
             </if>
-            <if test="accountId != null and accountId != '' " >
-                a.account_id = #{accountId},
+            <if test="merchantId != null and merchantId != '' " >
+                a.merchant_id = #{merchantId},
             </if>
             <if test="bankName != null and bankName != '' " >
                 a.bank_name = #{bankName},
@@ -451,8 +451,8 @@
         <include refid="Base_Column_List_Two" />
         from tb_fr_bank a left join tb_fr_mobile_card b on a.mobile_card_id = b.id and b.is_arrears =1 and b.heartbeat_status = 2 and b.use_status = 1 and b.yn = 0
         left join tb_fr_bank_strategy c on a.id = c.bank_id and c.use_status = 1 and c.yn = 0
-        left join tb_fr_merchant d on a.account_id = d.id and (d.least_money - d.balance) > #{money} and d.operate_type = 1 and d.use_status = 1 and d.yn = 0
-        left join tb_fr_merchant_site e on a.card_site_id = e.id and e.yn = 0
+        left join tb_fr_merchant d on a.merchant_id = d.id and (d.least_money - d.balance) > #{money} and d.operate_type = 1 and d.use_status = 1 and d.yn = 0
+        left join tb_fr_merchant_site e on a.merchant_site_id = e.id and e.yn = 0
         where 1=1
         <if test="yesBankIdList != null and yesBankIdList.size()>0">
             and a.id in

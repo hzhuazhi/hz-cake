@@ -102,9 +102,9 @@ public class OrderModel extends BasePage implements Serializable {
     private String phoneNum;
 
     /**
-     * 归属卡商的账号ID：对应表tb_hz_sys_account的主键ID，并且角色类型是卡商
+     * 归属卡商的账号ID：对应表tb_fr_merchant的主键ID，并且角色类型是卡商
      */
-    private Long accountId;
+    private Long merchantId;
 
     /**
      * 银行归属卡商名称
@@ -112,9 +112,9 @@ public class OrderModel extends BasePage implements Serializable {
     private String merchantName;
 
     /**
-     * 银行卡归属卡站点ID：对应表tb_hz_sys_account的主键ID，并且角色是卡站点
+     * 银行卡归属卡站点ID：对应表tb_fr_merchant_site的主键ID，并且角色是卡站点
      */
-    private Long cardSiteId;
+    private Long merchantSiteId;
 
     /**
      * 卡站点名称
@@ -354,12 +354,12 @@ public class OrderModel extends BasePage implements Serializable {
         this.phoneNum = phoneNum;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getMerchantId() {
+        return merchantId;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setMerchantId(Long merchantId) {
+        this.merchantId = merchantId;
     }
 
     public String getMerchantName() {
@@ -530,12 +530,12 @@ public class OrderModel extends BasePage implements Serializable {
         this.distributionMoney = distributionMoney;
     }
 
-    public Long getCardSiteId() {
-        return cardSiteId;
+    public Long getMerchantSiteId() {
+        return merchantSiteId;
     }
 
-    public void setCardSiteId(Long cardSiteId) {
-        this.cardSiteId = cardSiteId;
+    public void setMerchantSiteId(Long merchantSiteId) {
+        this.merchantSiteId = merchantSiteId;
     }
 
     public String getCardSiteName() {
