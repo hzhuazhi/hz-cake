@@ -217,6 +217,11 @@ public class OrderModel extends BasePage implements Serializable {
      */
     private String orderStatusStr;
 
+    /**
+     * 手续费
+     */
+    private String serviceCharge;
+
     public OrderModel(){
 
     }
@@ -539,5 +544,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setCardSiteName(String cardSiteName) {
         this.cardSiteName = cardSiteName;
+    }
+
+    public String getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(String serviceCharge) {
+        this.serviceCharge = serviceCharge;
     }
 }

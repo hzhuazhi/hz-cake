@@ -5,10 +5,10 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.account_id,a.alias,a.total_money,a.least_money,a.balance,a.lock_money,a.merchant_type,
-        a.remark,a.use_status,
-        a.create_time,a.update_time,a.yn,
-        b.ac_name,b.ac_contacts
+        a.id,a.alias,a.account_num,a.pass_wd,a.withdraw_pass_wd,a.role_id,a.ac_name,a.ac_contacts,a.ac_phone,a.ac_type,
+        a.total_money,a.least_money,a.balance,a.lock_money,a.merchant_type,a.operate_type,a.total_profit,a.pay_type,a.service_charge,
+        a.remark,a.use_status,a.create_user_id,a.create_role_id,a.update_user_id,a.update_role_id,
+        a.create_time,a.update_time,a.yn
     </sql>
 
     <!-- 查询条件 -->
@@ -18,20 +18,22 @@
             <if test="id != null and id != '' " >
                 and a.id = #{id}
             </if>
-            <if test="accountId != null and accountId != '' " >
-                and a.account_id = #{accountId}
-            </if>
             <if test="money != null and money != '' " >
                 and a.balance > #{money}
             </if>
             <if test="merchantType != null and merchantType != '' " >
                 and a.merchant_type = #{merchantType}
             </if>
+            <if test="operateType != null and operateType != '' " >
+                and a.operate_type = #{operateType}
+            </if>
+            <if test="payType != null and payType != '' " >
+                and a.pay_type = #{payType}
+            </if>
             <if test="useStatus != null and useStatus != '' " >
                 and a.use_status = #{useStatus}
             </if>
             and a.yn = 0
-            and b.id is not null
         </trim>
     </sql>
 
@@ -57,7 +59,7 @@
     <select id="findAll" resultType="com.hz.cake.master.core.model.merchant.MerchantModel">
         select
         <include refid="Base_Column_List" />
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause"/>
     </select>
 
@@ -65,7 +67,7 @@
     <select id="findByCondition" parameterType="Object" resultType="com.hz.cake.master.core.model.merchant.MerchantModel">
         select
         <include refid="Base_Column_List" />
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause"/>
     </select>
 
@@ -73,7 +75,7 @@
     <select id="findByObject" parameterType="Object" resultType="com.hz.cake.master.core.model.merchant.MerchantModel">
         select
         <include refid="Base_Column_List" />
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause"/>
         limit 1
     </select>
@@ -82,7 +84,7 @@
     <select id="findById" parameterType="java.lang.Long" resultType="com.hz.cake.master.core.model.merchant.MerchantModel">
         select
         <include refid="Base_Column_List" />
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause_id"/>
     </select>
 
@@ -90,7 +92,7 @@
     <!-- 查询总数-->
     <select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
         select count(1)
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause"/>
     </select>
 
@@ -98,7 +100,7 @@
     <select id="queryByList" parameterType="Object" resultType="com.hz.cake.master.core.model.merchant.MerchantModel">
         select
         <include refid="Base_Column_List" />
-        from tb_fr_merchant a left join tb_hz_sys_account b on a.account_id = b.id and b.is_enable = 2 and b.yn = 0
+        from tb_fr_merchant a
         <include refid="Example_Where_Clause"/>
         <include refid="Example_Order_By"/>
         <if test="pageNumber != null and pageNumber != ''" >
@@ -114,11 +116,32 @@
         <!--</selectKey>-->
         insert into tb_fr_merchant
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="accountId != null and accountId != '' " >
-                account_id,
-            </if>
             <if test="alias != null and alias != '' " >
                 alias,
+            </if>
+            <if test="accountNum != null and accountNum != '' " >
+                account_num,
+            </if>
+            <if test="passWd != null and passWd != '' " >
+                pass_wd,
+            </if>
+            <if test="withdrawPassWd != null and withdrawPassWd != '' " >
+                withdraw_pass_wd,
+            </if>
+            <if test="roleId != null and roleId != '' " >
+                role_id,
+            </if>
+            <if test="acName != null and acName != '' " >
+                ac_name,
+            </if>
+            <if test="acContacts != null and acContacts != '' " >
+                ac_contacts,
+            </if>
+            <if test="acPhone != null and acPhone != '' " >
+                ac_phone,
+            </if>
+            <if test="acType != null and acType != '' " >
+                ac_type,
             </if>
             <if test="totalMoney != null and totalMoney != '' " >
                 total_money,
@@ -135,21 +158,66 @@
             <if test="merchantType != null and merchantType != '' " >
                 merchant_type,
             </if>
+            <if test="operateType != null and operateType != '' " >
+                operate_type,
+            </if>
+            <if test="totalProfit != null and totalProfit != '' " >
+                total_profit,
+            </if>
+            <if test="payType != null and payType != '' " >
+                pay_type,
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                service_charge,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
             <if test="useStatus != null and useStatus != '' " >
                 use_status,
             </if>
+            <if test="createUserId != null and createUserId != '' " >
+                create_user_id,
+            </if>
+            <if test="createRoleId != null and createRoleId != '' " >
+                create_role_id,
+            </if>
+            <if test="updateUserId != null and updateUserId != '' " >
+                update_user_id,
+            </if>
+            <if test="updateRoleId != null and updateRoleId != '' " >
+                update_role_id,
+            </if>
             create_time,
         </trim>
         values
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="accountId != null and accountId != '' " >
-                <![CDATA[  #{accountId}, ]]>
-            </if>
             <if test="alias != null and alias != '' " >
                 <![CDATA[  #{alias}, ]]>
+            </if>
+            <if test="accountNum != null and accountNum != '' " >
+                <![CDATA[  #{accountNum}, ]]>
+            </if>
+            <if test="passWd != null and passWd != '' " >
+                <![CDATA[  #{passWd}, ]]>
+            </if>
+            <if test="withdrawPassWd != null and withdrawPassWd != '' " >
+                <![CDATA[  #{withdrawPassWd}, ]]>
+            </if>
+            <if test="roleId != null and roleId != '' " >
+                <![CDATA[  #{roleId}, ]]>
+            </if>
+            <if test="acName != null and acName != '' " >
+                <![CDATA[  #{acName}, ]]>
+            </if>
+            <if test="acContacts != null and acContacts != '' " >
+                <![CDATA[  #{acContacts}, ]]>
+            </if>
+            <if test="acPhone != null and acPhone != '' " >
+                <![CDATA[  #{acPhone}, ]]>
+            </if>
+            <if test="acType != null and acType != '' " >
+                <![CDATA[  #{acType}, ]]>
             </if>
             <if test="totalMoney != null and totalMoney != '' " >
                 <![CDATA[  #{totalMoney}, ]]>
@@ -166,11 +234,35 @@
             <if test="merchantType != null and merchantType != '' " >
                 <![CDATA[  #{merchantType}, ]]>
             </if>
+            <if test="operateType != null and operateType != '' " >
+                <![CDATA[  #{operateType}, ]]>
+            </if>
+            <if test="totalProfit != null and totalProfit != '' " >
+                <![CDATA[  #{totalProfit}, ]]>
+            </if>
+            <if test="payType != null and payType != '' " >
+                <![CDATA[  #{payType}, ]]>
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                <![CDATA[  #{serviceCharge}, ]]>
+            </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>
             </if>
             <if test="useStatus != null and useStatus != '' " >
                 <![CDATA[  #{useStatus}, ]]>
+            </if>
+            <if test="createUserId != null and createUserId != '' " >
+                <![CDATA[  #{createUserId}, ]]>
+            </if>
+            <if test="createRoleId != null and createRoleId != '' " >
+                <![CDATA[  #{createRoleId}, ]]>
+            </if>
+            <if test="updateUserId != null and updateUserId != '' " >
+                <![CDATA[  #{updateUserId}, ]]>
+            </if>
+            <if test="updateRoleId != null and updateRoleId != '' " >
+                <![CDATA[  #{updateRoleId}, ]]>
             </if>
             NOW(),
         </trim>
@@ -180,11 +272,32 @@
     <update id="update" parameterType="com.hz.cake.master.core.model.merchant.MerchantModel">
         UPDATE tb_fr_merchant a
         <trim prefix="set" suffixOverrides=",">
-            <if test="accountId != null and accountId != '' " >
-                a.account_id = #{accountId},
-            </if>
             <if test="alias != null and alias != '' " >
                 a.alias = #{alias},
+            </if>
+            <if test="accountNum != null and accountNum != '' " >
+                a.account_num = #{accountNum},
+            </if>
+            <if test="passWd != null and passWd != '' " >
+                a.pass_wd = #{passWd},
+            </if>
+            <if test="withdrawPassWd != null and withdrawPassWd != '' " >
+                a.withdraw_pass_wd = #{withdrawPassWd},
+            </if>
+            <if test="roleId != null and roleId != '' " >
+                a.role_id = #{roleId},
+            </if>
+            <if test="acName != null and acName != '' " >
+                a.ac_name = #{acName},
+            </if>
+            <if test="acContacts != null and acContacts != '' " >
+                a.ac_contacts = #{acContacts},
+            </if>
+            <if test="acPhone != null and acPhone != '' " >
+                a.ac_phone = #{acPhone},
+            </if>
+            <if test="acType != null and acType != '' " >
+                a.ac_type = #{acType},
             </if>
             <if test="totalMoney != null and totalMoney != '' " >
                 a.total_money = #{totalMoney},
@@ -200,6 +313,18 @@
             </if>
             <if test="merchantType != null and merchantType != '' " >
                 a.merchant_type = #{merchantType},
+            </if>
+            <if test="operateType != null and operateType != '' " >
+                a.operate_type = #{operateType},
+            </if>
+            <if test="totalProfit != null and totalProfit != '' " >
+                a.total_profit = #{totalProfit},
+            </if>
+            <if test="payType != null and payType != '' " >
+                a.pay_type = #{payType},
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                a.service_charge = #{serviceCharge},
             </if>
             <if test="remark != null and remark != '' " >
                 a.remark = #{remark},

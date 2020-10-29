@@ -575,6 +575,9 @@ public class HodgepodgeMethod {
                 resBean.setChannelName(channelModel.getAlias());
             }
         }
+        if (!StringUtils.isBlank(bankModel.getServiceCharge())){
+            resBean.setServiceCharge(bankModel.getServiceCharge());
+        }
 
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));

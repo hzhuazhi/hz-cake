@@ -9,7 +9,8 @@
     <sql id="Base_Column_List">
         a.id,a.bank_id,a.order_no,a.order_type,a.order_money,a.distribution_money,a.qr_code,a.out_trade_no,a.order_status,
         a.invalid_time,a.notify_url,a.bank_name,a.bank_card,a.account_name,a.bank_code,a.mobile_card_id,
-        a.phone_num,a.account_id,a.merchant_name,a.card_site_id,a.card_site_name,a.channel_id,a.channel_name,a.replenish_type,a.work_type,
+        a.phone_num,a.account_id,a.merchant_name,a.card_site_id,a.card_site_name,a.channel_id,a.channel_name,a.service_charge,
+        a.replenish_type,a.work_type,
         a.data_explain,a.remark,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn
@@ -204,6 +205,9 @@
             <if test="channelName != null and channelName != '' " >
                 channel_name,
             </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                service_charge,
+            </if>
             <if test="replenishType != null and replenishType != '' " >
                 replenish_type,
             </if>
@@ -294,6 +298,9 @@
             </if>
             <if test="channelName != null and channelName != '' " >
                 <![CDATA[  #{channelName}, ]]>
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                <![CDATA[  #{serviceCharge}, ]]>
             </if>
             <if test="replenishType != null and replenishType != '' " >
                 <![CDATA[  #{replenishType}, ]]>

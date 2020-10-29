@@ -277,6 +277,11 @@ public class BankModel extends BasePage implements Serializable {
      */
     private String cardSiteName;
 
+    /**
+     * 手续费
+     */
+    private String serviceCharge;
+
     public Long getId() {
         return id;
     }
@@ -677,5 +682,13 @@ public class BankModel extends BasePage implements Serializable {
 
     public void setCardSiteName(String cardSiteName) {
         this.cardSiteName = cardSiteName;
+    }
+
+    public String getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(String serviceCharge) {
+        this.serviceCharge = serviceCharge;
     }
 }

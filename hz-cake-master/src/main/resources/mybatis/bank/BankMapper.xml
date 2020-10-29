@@ -22,8 +22,8 @@
         b.phone_num,
         c.id as bank_strategy_id,c.bank_id,c.alias,c.priority,c.open_time_slot,c.wx_in_day_money,c.wx_in_month_money,c.wx_in_day_num,c.zfb_in_day_money,c.zfb_in_month_money,
         c.zfb_in_day_num,c.card_in_day_money,c.card_in_month_money,c.card_in_day_num,
-        d.ac_name,d.ac_contacts,
-        f.ac_name as card_site_name
+        d.ac_name,d.ac_contacts,d.service_charge,
+        e.ac_name as card_site_name
     </sql>
 
     <!-- 查询条件 -->
@@ -451,10 +451,8 @@
         <include refid="Base_Column_List_Two" />
         from tb_fr_bank a left join tb_fr_mobile_card b on a.mobile_card_id = b.id and b.is_arrears =1 and b.heartbeat_status = 2 and b.use_status = 1 and b.yn = 0
         left join tb_fr_bank_strategy c on a.id = c.bank_id and c.use_status = 1 and c.yn = 0
-        left join tb_hz_sys_account d on a.account_id = d.id and d.role_id = 2 and d.is_enable = 2 and d.yn = 0
-        <!--left join tb_fr_merchant e on d.id = e.account_id and (e.least_money+0) > (e.balance+0) and (e.least_money + 0) > #{money} and e.use_status = 1 and e.yn = 0-->
-        left join tb_fr_merchant e on d.id = e.account_id and (e.least_money - e.balance) > #{money} and e.use_status = 1 and e.yn = 0
-        left join tb_hz_sys_account f on a.card_site_id = f.id and f.role_id = 3 and f.yn = 0
+        left join tb_fr_merchant d on a.account_id = d.id and (d.least_money - d.balance) > #{money} and d.operate_type = 1 and d.use_status = 1 and d.yn = 0
+        left join tb_fr_merchant_site e on a.card_site_id = e.id and e.yn = 0
         where 1=1
         <if test="yesBankIdList != null and yesBankIdList.size()>0">
             and a.id in
@@ -472,7 +470,6 @@
         and b.id is not null
         and c.id is not null
         and d.id is not null
-        and e.id is not null
         <!-- order by c.priority asc -->
     </select>
 

@@ -20,14 +20,49 @@ public class MerchantModel extends BasePage implements Serializable {
     private Long id;
 
     /**
-     * 归属的账号ID：对应表tb_hz_sys_account的主键ID，并且角色类型是卡商
-     */
-    private Long accountId;
-
-    /**
      * 名称/别名
      */
     private String alias;
+
+    /**
+     * 账号
+     */
+    private String accountNum;
+
+    /**
+     * 登录密码
+     */
+    private String passWd;
+
+    /**
+     * 提款密码
+     */
+    private String withdrawPassWd;
+
+    /**
+     * 所属角色ID
+     */
+    private Long roleId;
+
+    /**
+     * 账号名称
+     */
+    private String acName;
+
+    /**
+     * 账号联系人
+     */
+    private String acContacts;
+
+    /**
+     * 联系电话
+     */
+    private String acPhone;
+
+    /**
+     * 账号类型
+     */
+    private Integer acType;
 
     /**
      * 总额：总共跑量的金额
@@ -55,6 +90,26 @@ public class MerchantModel extends BasePage implements Serializable {
     private Integer merchantType;
 
     /**
+     * 卡商运营类型/运营性质：1 代付，2代收
+     */
+    private Integer operateType;
+
+    /**
+     * 总收益金额
+     */
+    private String totalProfit;
+
+    /**
+     * 代付款类型：1手动付款，2API自动付款
+     */
+    private Integer payType;
+
+    /**
+     * 手续费
+     */
+    private String serviceCharge;
+
+    /**
      * 备注
      */
     private String remark;
@@ -62,7 +117,27 @@ public class MerchantModel extends BasePage implements Serializable {
     /**
      * 使用状态:1初始化有效正常使用，2无效暂停使用
      */
-    private Integer useStatus;
+    private String useStatus;
+
+    /**
+     * 创建人ID
+     */
+    private Long createUserId;
+
+    /**
+     * 创建人归属角色ID
+     */
+    private Long createRoleId;
+
+    /**
+     * 更新人ID
+     */
+    private Long updateUserId;
+
+    /**
+     * 更新人归属角色ID
+     */
+    private Long updateRoleId;
 
     /**
      * 创建时间
@@ -84,16 +159,6 @@ public class MerchantModel extends BasePage implements Serializable {
      */
     private BigDecimal money;
 
-    /**
-     * 账号昵称
-     */
-    private String acName;
-
-    /**
-     * 账号联系人
-     */
-    private String acContacts;
-
     public Long getId() {
         return id;
     }
@@ -110,12 +175,76 @@ public class MerchantModel extends BasePage implements Serializable {
         this.alias = alias;
     }
 
-    public String getBalance() {
-        return balance;
+    public String getAccountNum() {
+        return accountNum;
     }
 
-    public void setBalance(String balance) {
-        this.balance = balance;
+    public void setAccountNum(String accountNum) {
+        this.accountNum = accountNum;
+    }
+
+    public String getPassWd() {
+        return passWd;
+    }
+
+    public void setPassWd(String passWd) {
+        this.passWd = passWd;
+    }
+
+    public String getWithdrawPassWd() {
+        return withdrawPassWd;
+    }
+
+    public void setWithdrawPassWd(String withdrawPassWd) {
+        this.withdrawPassWd = withdrawPassWd;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getAcName() {
+        return acName;
+    }
+
+    public void setAcName(String acName) {
+        this.acName = acName;
+    }
+
+    public String getAcContacts() {
+        return acContacts;
+    }
+
+    public void setAcContacts(String acContacts) {
+        this.acContacts = acContacts;
+    }
+
+    public String getAcPhone() {
+        return acPhone;
+    }
+
+    public void setAcPhone(String acPhone) {
+        this.acPhone = acPhone;
+    }
+
+    public Integer getAcType() {
+        return acType;
+    }
+
+    public void setAcType(Integer acType) {
+        this.acType = acType;
+    }
+
+    public String getTotalMoney() {
+        return totalMoney;
+    }
+
+    public void setTotalMoney(String totalMoney) {
+        this.totalMoney = totalMoney;
     }
 
     public String getLeastMoney() {
@@ -126,6 +255,62 @@ public class MerchantModel extends BasePage implements Serializable {
         this.leastMoney = leastMoney;
     }
 
+    public String getBalance() {
+        return balance;
+    }
+
+    public void setBalance(String balance) {
+        this.balance = balance;
+    }
+
+    public String getLockMoney() {
+        return lockMoney;
+    }
+
+    public void setLockMoney(String lockMoney) {
+        this.lockMoney = lockMoney;
+    }
+
+    public Integer getMerchantType() {
+        return merchantType;
+    }
+
+    public void setMerchantType(Integer merchantType) {
+        this.merchantType = merchantType;
+    }
+
+    public Integer getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(Integer operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getTotalProfit() {
+        return totalProfit;
+    }
+
+    public void setTotalProfit(String totalProfit) {
+        this.totalProfit = totalProfit;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
+    public String getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(String serviceCharge) {
+        this.serviceCharge = serviceCharge;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -134,12 +319,44 @@ public class MerchantModel extends BasePage implements Serializable {
         this.remark = remark;
     }
 
-    public Integer getUseStatus() {
+    public String getUseStatus() {
         return useStatus;
     }
 
-    public void setUseStatus(Integer useStatus) {
+    public void setUseStatus(String useStatus) {
         this.useStatus = useStatus;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public Long getCreateRoleId() {
+        return createRoleId;
+    }
+
+    public void setCreateRoleId(Long createRoleId) {
+        this.createRoleId = createRoleId;
+    }
+
+    public Long getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(Long updateUserId) {
+        this.updateUserId = updateUserId;
+    }
+
+    public Long getUpdateRoleId() {
+        return updateRoleId;
+    }
+
+    public void setUpdateRoleId(Long updateRoleId) {
+        this.updateRoleId = updateRoleId;
     }
 
     public String getCreateTime() {
@@ -172,53 +389,5 @@ public class MerchantModel extends BasePage implements Serializable {
 
     public void setMoney(BigDecimal money) {
         this.money = money;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public Integer getMerchantType() {
-        return merchantType;
-    }
-
-    public void setMerchantType(Integer merchantType) {
-        this.merchantType = merchantType;
-    }
-
-    public String getAcName() {
-        return acName;
-    }
-
-    public void setAcName(String acName) {
-        this.acName = acName;
-    }
-
-    public String getAcContacts() {
-        return acContacts;
-    }
-
-    public void setAcContacts(String acContacts) {
-        this.acContacts = acContacts;
-    }
-
-    public String getTotalMoney() {
-        return totalMoney;
-    }
-
-    public void setTotalMoney(String totalMoney) {
-        this.totalMoney = totalMoney;
-    }
-
-    public String getLockMoney() {
-        return lockMoney;
-    }
-
-    public void setLockMoney(String lockMoney) {
-        this.lockMoney = lockMoney;
     }
 }
