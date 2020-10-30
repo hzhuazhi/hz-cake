@@ -33,6 +33,13 @@
             <if test="useStatus != null and useStatus != '' " >
                 and a.use_status = #{useStatus}
             </if>
+            <if test="idList != null and idList.size()>0">
+                and a.id in
+                <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
             and a.yn = 0
         </trim>
     </sql>
@@ -360,6 +367,23 @@
         </trim>
         where 1=1
         <include refid="Example_Where_Clause_id"/>
+    </update>
+
+
+    <!-- 更新卡商的余额 -->
+    <update id="updateBalance" parameterType="com.hz.cake.master.core.model.merchant.MerchantModel">
+        UPDATE tb_fr_merchant a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="addBalance != null and addBalance != '' " >
+                a.balance = a.balance + #{orderMoney},
+            </if>
+            <if test="subtractBalance != null and subtractBalance != '' " >
+                a.balance = a.balance - #{orderMoney},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
     </update>
 
 

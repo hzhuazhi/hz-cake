@@ -111,4 +111,15 @@ public interface CacheKey {
      */
     String BANK_BINDING_TYPE = "-18";
 
+    /**
+     * 给出绑定卡商的ID纪录
+     */
+    String MERCHANT_BINDING_TYPE = "-19";
+
+    /**
+     * 锁：在筛选商户，需要先锁住此商户
+     * 高并发避免出现问题
+     */
+    String LOCK_MERCHANT = "-20";
+
 }

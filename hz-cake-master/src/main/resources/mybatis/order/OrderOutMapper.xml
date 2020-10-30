@@ -5,7 +5,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.alias,a.order_no,a.order_money,a.out_trade_no,a.order_status,a.order_type,a.invalid_time,a.in_bank_card,
+        a.id,a.alias,a.order_no,a.order_money,a.out_trade_no,a.order_status,a.order_type,a.service_charge,a.invalid_time,a.in_bank_card,
         a.in_bank_name,a.in_account_name,a.out_bank_name,a.out_bank_card,a.out_account_name,a.merchant_id,a.merchant_name,a.merchant_site_id,a.merchant_site_name,
         a.channel_id,a.channel_name,a.picture_ads,a.check_status,a.check_info,a.notify_url,a.operate_status,a.work_type,a.data_explain,
         a.remark,a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
@@ -157,6 +157,9 @@
             <if test="orderType != null and orderType != '' " >
                 order_type,
             </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                service_charge,
+            </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 invalid_time,
             </if>
@@ -257,14 +260,14 @@
             <if test="outTradeNo != null and outTradeNo != '' " >
                 <![CDATA[  #{outTradeNo}, ]]>
             </if>
-            <if test="roleId != null and roleId != '' " >
-                <![CDATA[  #{roleId}, ]]>
-            </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 <![CDATA[  #{orderStatus}, ]]>
             </if>
             <if test="orderType != null and orderType != '' " >
                 <![CDATA[  #{orderType}, ]]>
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                <![CDATA[  #{serviceCharge}, ]]>
             </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 <![CDATA[  #{invalidTime}, ]]>
@@ -278,8 +281,8 @@
             <if test="inAccountName != null and inAccountName != '' " >
                 <![CDATA[  #{inAccountName}, ]]>
             </if>
-            <if test="out_bank_name != null and out_bank_name != '' " >
-                <![CDATA[  #{out_bank_name}, ]]>
+            <if test="outBankName != null and outBankName != '' " >
+                <![CDATA[  #{outBankName}, ]]>
             </if>
             <if test="outBankCard != null and outBankCard != '' " >
                 <![CDATA[  #{outBankCard}, ]]>
@@ -376,6 +379,9 @@
             <if test="orderType != null and orderType != '' " >
                 a.order_type = #{orderType},
             </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                a.service_charge = #{serviceCharge},
+            </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 a.invalid_time = #{invalidTime},
             </if>
@@ -388,8 +394,8 @@
             <if test="inAccountName != null and inAccountName != '' " >
                 a.in_account_name = #{inAccountName},
             </if>
-            <if test="out_bank_name != null and out_bank_name != '' " >
-                a.out_bank_name = #{out_bank_name},
+            <if test="outBankName != null and outBankName != '' " >
+                a.out_bank_name = #{outBankName},
             </if>
             <if test="outBankCard != null and outBankCard != '' " >
                 a.out_bank_card = #{outBankCard},

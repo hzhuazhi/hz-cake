@@ -2,14 +2,19 @@ package com.hz.cake.master.util;
 
 import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.utils.StringUtil;
+import com.hz.cake.master.core.model.merchant.MerchantBalanceDeductModel;
+import com.hz.cake.master.core.model.merchant.MerchantChannelModel;
+import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
+import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
 import com.hz.cake.master.core.protocol.request.order.RequestOrder;
 import com.hz.cake.master.core.protocol.request.statistics.RequestStatisticsClickPay;
 import com.hz.cake.master.core.protocol.response.ResponseData;
 import com.hz.cake.master.core.protocol.response.issue.Issue;
 import com.hz.cake.master.core.protocol.response.issue.ResponseIssue;
 import com.hz.cake.master.core.protocol.response.order.Order;
+import com.hz.cake.master.core.protocol.response.order.OrderOut;
 import com.hz.cake.master.core.protocol.response.order.ResponseOrder;
 import com.hz.cake.master.core.common.exception.ServiceException;
 import com.hz.cake.master.core.common.utils.BeanUtils;
@@ -31,6 +36,7 @@ import com.hz.cake.master.core.model.region.RegionModel;
 import com.hz.cake.master.core.model.shortchain.ShortChainModel;
 import com.hz.cake.master.core.model.statistics.StatisticsClickPayModel;
 import com.hz.cake.master.core.model.strategy.StrategyModel;
+import com.hz.cake.master.core.protocol.response.order.ResponseOrderOut;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1371,6 +1377,445 @@ public class HodgepodgeMethod {
         String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.BANK_BINDING_TYPE, bankBindingType, channelId);
         ComponentUtil.redisService.set(strKeyCache, String.valueOf(bankId));
     }
+
+
+
+    /**
+     * @Description: check校验数据当派发订单的时候-代付订单
+     * @param requestModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static void checkOrderOutAdd(ProtocolOrderOut requestModel) throws Exception{
+        // 1.校验所有数据
+        if (requestModel == null ){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00001.geteCode(), ErrorCode.ENUM_ERROR.OU00001.geteDesc());
+        }
+
+        // 校验金额是否为空
+        if (StringUtils.isBlank(requestModel.money)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00002.geteCode(), ErrorCode.ENUM_ERROR.OU00002.geteDesc());
+        }else {
+            // 金额是否有效
+            if (requestModel.money.indexOf(".") > -1){
+                boolean flag = StringUtil.isNumberByMoney(requestModel.money);
+                if (!flag){
+                    throw new ServiceException(ErrorCode.ENUM_ERROR.OU00003.geteCode(), ErrorCode.ENUM_ERROR.OU00003.geteDesc());
+                }
+            }else {
+                boolean flag = StringUtil.isNumer(requestModel.money);
+                if (!flag){
+                    throw new ServiceException(ErrorCode.ENUM_ERROR.OU00004.geteCode(), ErrorCode.ENUM_ERROR.OU00004.geteDesc());
+                }
+            }
+        }
+
+        if (StringUtils.isBlank(requestModel.secretKey)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00005.geteCode(), ErrorCode.ENUM_ERROR.OU00005.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: 校验策略类型数据:出码开关-判断此时是否属于正常出码-代付订单
+     * @return void
+     * @author yoko
+     * @date 2019/12/2 14:35
+     */
+    public static void checkStrategyByOutQrCodeSwitch(StrategyModel strategyModel) throws Exception{
+        if (strategyModel == null){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.S00006.geteCode(), ErrorCode.ENUM_ERROR.S00006.geteDesc());
+        }
+        if (strategyModel.getStgNumValue() == 1){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.S00007.geteCode(), ErrorCode.ENUM_ERROR.S00007.geteDesc());
+        }
+        if (strategyModel.getStgNumValue() == 2){
+            if (StringUtils.isBlank(strategyModel.getStgValue())){
+                throw new ServiceException(ErrorCode.ENUM_ERROR.S00008.geteCode(), ErrorCode.ENUM_ERROR.S00008.geteDesc());
+            }else{
+                String[] str = strategyModel.getStgValue().split("-");
+                boolean flag = DateUtil.isBelong(str[0], str[1]);
+                if (!flag){
+                    throw new ServiceException(ErrorCode.ENUM_ERROR.S00009.geteCode(), ErrorCode.ENUM_ERROR.S00009.geteDesc());
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @Description: check订单是否在策略规定的范围内-代付金额
+     * @param orderMoneyRange - 策略规定的订单金额范围
+     * @param orderMoney - 订单金额
+     * @return java.lang.String
+     * @author yoko
+     * @date 2020/6/6 11:48
+     */
+    public static void checkOutOrderMoney(String orderMoneyRange, String orderMoney) throws Exception{
+        String [] rule = orderMoneyRange.split("-");
+        double start = Double.parseDouble(rule[0]);
+        double end = Double.parseDouble(rule[1]);
+        double money = Double.parseDouble(orderMoney);
+        if (money < start || money > end){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.S00010.geteCode(), ErrorCode.ENUM_ERROR.S00010.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: check商户数据是否为空-代付订单
+     * @param channelModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static void checkOutOrderChannelIsNull(ChannelModel channelModel) throws Exception{
+        if (channelModel == null || channelModel.getId() == null || channelModel.getId() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00006.geteCode(), ErrorCode.ENUM_ERROR.OU00006.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: 组装查询卡商与渠道关联关系
+     * @param id - 主键ID
+     * @param merchantId - 卡商ID
+     * @param merchantSiteId - 卡站点ID
+     * @param channelId - 渠道ID
+     * @param useStatus - 使用状态
+     * @return com.hz.cake.master.core.model.merchant.MerchantChannelModel
+     * @author yoko
+     * @date 2020/10/30 14:04
+     */
+    public static MerchantChannelModel assembleMerchantChannelQuery(long id, long merchantId, long merchantSiteId, long channelId, int useStatus){
+        MerchantChannelModel resBean = new MerchantChannelModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (merchantId > 0){
+            resBean.setMerchantId(merchantId);
+        }
+        if (merchantSiteId > 0){
+            resBean.setMerchantSiteId(merchantSiteId);
+        }
+        if (channelId > 0){
+            resBean.setChannelId(channelId);
+        }
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        return resBean;
+    }
+    
+    
+    /**
+     * @Description: check校验卡商与渠道的关联关系是否为空
+     * @param merchantChannelList
+     * @return 
+     * @author yoko
+     * @date 2020/10/30 14:12
+    */
+    public static void checkMerchantChannelIsNull(List<MerchantChannelModel> merchantChannelList) throws Exception{
+        if (merchantChannelList == null || merchantChannelList.size() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00007.geteCode(), ErrorCode.ENUM_ERROR.OU00007.geteDesc());
+        }
+    }
+
+    /**
+     * @Description: 组装查询卡商信息的方法
+     * @param id - 主键ID
+     * @param merchantType - 卡商类型：1我方卡商，2第三方卡商
+     * @param operateType - 卡商运营类型/运营性质：1代收，2代付
+     * @param idList - 卡商主键ID集合
+     * @param orderMoney - 订单金额
+     * @param useStatus - 使用状态:1初始化有效正常使用，2无效暂停使用
+     * @return com.hz.cake.master.core.model.merchant.MerchantModel
+     * @author yoko
+     * @date 2020/10/30 14:40
+     */
+    public static MerchantModel assembleMerchantQuery(long id, int merchantType, int operateType, List<Long> idList, String orderMoney, int useStatus){
+        MerchantModel resBean = new MerchantModel();
+        if (!StringUtils.isBlank(orderMoney)){
+            BigDecimal bd = new BigDecimal(orderMoney);
+            resBean.setMoney(bd);
+        }
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (merchantType > 0){
+            resBean.setMerchantType(merchantType);
+        }
+        if (operateType > 0){
+            resBean.setOperateType(operateType);
+        }
+        if (idList != null && idList.size() > 0){
+            resBean.setIdList(idList);
+        }
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: check校验卡商集合是否为空
+     * @param merchantList
+     * @return
+     * @author yoko
+     * @date 2020/10/30 14:12
+     */
+    public static void checkMerchantIsNullByOutOrder(List<MerchantModel> merchantList) throws Exception{
+        if (merchantList == null || merchantList.size() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00008.geteCode(), ErrorCode.ENUM_ERROR.OU00008.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: 获取上一次使用过的卡商ID
+     * <p>
+     *     从缓存中获取上次给出码的卡商ID
+     *     数据来由：每次给出之后，把卡商ID进行纪录
+     * </p>
+     * @param bankBindingType - 卡商绑定类型
+     * @param channelId - 渠道的主键ID
+     * @return
+     * @author yoko
+     * @date 2020/5/21 15:38
+     */
+    public static long getMaxMerchantByRedis(int bankBindingType, long channelId) throws Exception{
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.MERCHANT_BINDING_TYPE, bankBindingType, channelId);
+        String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
+        if (!StringUtils.isBlank(strCache)) {
+            return Long.parseLong(strCache);
+        }else{
+            return 0;
+        }
+    }
+
+
+
+    /**
+     * @Description: 卡商集合排序
+     * <p>
+     *     排序方式：小于上次给过的卡商ID放在集合的后面，大于上次给过的卡商ID放集合的前面
+     * </p>
+     * @param merchantList - 卡商集合
+     * @param maxMerchantId - 上次给出的卡商ID
+     * @return java.util.List<BankModel>
+     * @author yoko
+     * @date 2020/10/10 11:49
+     */
+    public static List<MerchantModel> sortMerchantList(List<MerchantModel> merchantList, long maxMerchantId){
+        if (maxMerchantId > 0){
+            List<MerchantModel> resList = new ArrayList<>();
+            List<MerchantModel> noList = new ArrayList<>();// 没有给出过出码的银行集合
+            List<MerchantModel> yesList = new ArrayList<>();// 有给出过出码的银行集合
+            for (MerchantModel merchantModel : merchantList){
+                if (merchantModel.getId() > maxMerchantId){
+                    noList.add(merchantModel);
+                }else {
+                    yesList.add(merchantModel);
+                }
+            }
+            if (noList != null && noList.size() > 0){
+                resList.addAll(noList);
+            }
+            if (yesList != null && yesList.size() > 0){
+                resList.addAll(yesList);
+            }
+            return resList;
+        }else {
+            return merchantList;
+        }
+    }
+
+    /**
+     * @Description: 组装变更卡商余额的方法
+     * @param id - 卡商主键ID
+     * @param type - 余额加减：1加，2减
+     * @param money - 变更的金额值
+     * @return com.hz.cake.master.core.model.merchant.MerchantModel
+     * @author yoko
+     * @date 2020/10/30 19:57
+     */
+    public static MerchantModel assembleMerchantByChanagerBalance(long id, int type, String money){
+        MerchantModel resBean = new MerchantModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (type > 0){
+            if (type == 1){
+                resBean.setAddBalance("1");
+            }else if (type == 2){
+                resBean.setSubtractBalance("1");
+            }
+        }
+        if (!StringUtils.isBlank(money)){
+            resBean.setOrderMoney(money);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装添加流水或查询流水的方法
+     * @param id - 主键ID
+     * @param merchantId - 卡商ID
+     * @param orderNo - 订单号
+     * @param orderType - 订单类型：1代收，2代付
+     * @param money - 订单金额
+     * @param orderStatus - 订单状态：1初始化，2超时/失败，3有质疑，4成功，5表示订单超时且操作状态属于初始化的
+     * @param delayTime - 延迟运行时间：当订单属于超时状态：则系统时间需要大于此时间才能进行逻辑操作
+     * @param lockTime - 锁定时间
+     * @param type - 操作类型：1查询，2添加数据
+     * @return com.hz.cake.master.core.model.merchant.MerchantBalanceDeductModel
+     * @author yoko
+     * @date 2020/10/30 20:21
+     */
+    public static MerchantBalanceDeductModel assembleMerchantBalanceDeduct(long id, long merchantId, String orderNo, int orderType, String money, int orderStatus,
+                                                                           String delayTime, String lockTime, int type){
+        MerchantBalanceDeductModel resBean = new MerchantBalanceDeductModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (merchantId > 0){
+            resBean.setMerchantId(merchantId);
+        }
+        if (!StringUtils.isBlank(orderNo)){
+            resBean.setOrderNo(orderNo);
+        }
+        if (orderType > 0){
+            resBean.setOrderType(orderType);
+        }
+        if (!StringUtils.isBlank(money)){
+            resBean.setMoney(money);
+        }
+        if (!StringUtils.isBlank(delayTime)){
+            resBean.setDelayTime(delayTime);
+        }
+        if (!StringUtils.isBlank(lockTime)){
+            resBean.setLockTime(lockTime);
+        }
+        if (type > 0){
+            if (type == 2){
+                resBean.setCurday(DateUtil.getDayNumber(new Date()));
+                resBean.setCurhour(DateUtil.getHour(new Date()));
+                resBean.setCurminute(DateUtil.getCurminute(new Date()));
+            }
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: check筛选的卡商是否为空
+     * @param merchantModel
+     * @return
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static void checkScreenMerchantsNull(MerchantModel merchantModel) throws Exception{
+        if (merchantModel == null || merchantModel.getId() == null || merchantModel.getId() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00009.geteCode(), ErrorCode.ENUM_ERROR.OU00009.geteDesc());
+        }
+    }
+
+
+
+    /**
+     * @Description: 组装添加代付订单的方法
+     * @param merchantModel - 筛选出的卡商
+     * @param requestModel - 请求数据
+     * @param channelModel - 商户信息
+     * @param orderNo - 订单号
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutAdd(MerchantModel merchantModel, ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo){
+        OrderOutModel resBean = new OrderOutModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+        resBean.setOrderType(merchantModel.getPayType());
+        resBean.setServiceCharge(merchantModel.getServiceCharge());
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        resBean.setMerchantId(merchantModel.getId());
+        if (!StringUtils.isBlank(merchantModel.getAcName())){
+            resBean.setMerchantName(merchantModel.getAcName());
+        }
+        resBean.setChannelId(channelModel.getId());
+        if (!StringUtils.isBlank(channelModel.getAlias())){
+            resBean.setChannelName(channelModel.getAlias());
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: check校验添加代付订单信息是否正常
+     * @param num
+     * @return
+     * @author yoko
+     * @date 2020/9/13 14:49
+     */
+    public static void checkAddOrderOutIsOk(int num) throws Exception{
+        if (num <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00010.geteCode(), ErrorCode.ENUM_ERROR.OU00010.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: redis：添加给出的银行卡ID
+     * @param bankBindingType - 卡商与渠道绑定类型
+     * @param channelId - 渠道ID
+     * @param merchantId - 卡商ID
+     * @return void
+     * @author yoko
+     * @date 2020/10/10 15:44
+     */
+    public static void saveMaxMerchantByRedis(int bankBindingType, long channelId, long merchantId){
+        if (bankBindingType == 1){
+            channelId = 0;
+        }
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.MERCHANT_BINDING_TYPE, bankBindingType, channelId);
+        ComponentUtil.redisService.set(strKeyCache, String.valueOf(merchantId));
+    }
+
+
+    /**
+     * @Description: 用户代付订单派单成功的数据组装返回客户端的方法
+     * @param stime - 服务器的时间
+     * @param sign - 签名
+     * @param orderOutModel - 代付订单的详情
+     * @return java.lang.String
+     * @author yoko
+     * @date 2019/11/25 22:45
+     */
+    public static String assembleOrderOutDataResult(long stime, String sign, OrderOutModel orderOutModel, String returnUrl) throws Exception{
+        ResponseOrderOut dataModel = new ResponseOrderOut();
+        if (orderOutModel != null){
+            OrderOut orderOut = new OrderOut();
+            orderOut.orderNo = orderOutModel.getOrderNo();
+            orderOut.orderMoney = orderOutModel.getOrderMoney();
+            orderOut.orderStatus = 1;
+            dataModel.orderOut = orderOut;
+        }
+        dataModel.setStime(stime);
+        dataModel.setSign(sign);
+        return JSON.toJSONString(dataModel);
+    }
+
+
 
 
 

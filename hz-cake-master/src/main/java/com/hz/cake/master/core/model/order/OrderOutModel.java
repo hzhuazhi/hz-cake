@@ -49,6 +49,11 @@ public class OrderOutModel extends BasePage implements Serializable {
     private Integer orderType;
 
     /**
+     * 手续费
+     */
+    private String serviceCharge;
+
+    /**
      * 失效时间：审核失效时间，超过多久没有点击审核通过则默认审核通过
      */
     private String invalidTime;
@@ -584,5 +589,13 @@ public class OrderOutModel extends BasePage implements Serializable {
 
     public void setInvalidTimeEnd(String invalidTimeEnd) {
         this.invalidTimeEnd = invalidTimeEnd;
+    }
+
+    public String getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(String serviceCharge) {
+        this.serviceCharge = serviceCharge;
     }
 }

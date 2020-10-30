@@ -4,6 +4,7 @@ import com.hz.cake.master.core.protocol.page.BasePage;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Description 卡商扩充数据的实体属性Bean
@@ -158,6 +159,26 @@ public class MerchantModel extends BasePage implements Serializable {
      * 金额
      */
     private BigDecimal money;
+
+    /**
+     * ID集合-SQL
+     */
+    private List<Long> idList;
+
+    /**
+     * 余额加
+     */
+    private String addBalance;
+
+    /**
+     * 余额减
+     */
+    private String subtractBalance;
+
+    /**
+     * 要进行更改的金额
+     */
+    private String orderMoney;
 
     public Long getId() {
         return id;
@@ -391,5 +412,37 @@ public class MerchantModel extends BasePage implements Serializable {
 
     public void setUseStatus(Integer useStatus) {
         this.useStatus = useStatus;
+    }
+
+    public List<Long> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
+    }
+
+    public String getAddBalance() {
+        return addBalance;
+    }
+
+    public void setAddBalance(String addBalance) {
+        this.addBalance = addBalance;
+    }
+
+    public String getSubtractBalance() {
+        return subtractBalance;
+    }
+
+    public void setSubtractBalance(String subtractBalance) {
+        this.subtractBalance = subtractBalance;
+    }
+
+    public String getOrderMoney() {
+        return orderMoney;
+    }
+
+    public void setOrderMoney(String orderMoney) {
+        this.orderMoney = orderMoney;
     }
 }
