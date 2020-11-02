@@ -71,7 +71,7 @@ public class IssueController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/issue/getDataList
+     * local:http://localhost:8093/cake/issue/getDataList
      * 请求的属性类:RequestIssue
      * 必填字段:{"noticeType":1,"agtVer":1,"clientVer":1,"clientType":1,"ctime":201911071802959,"cctime":201911071802959,"sign":"abcdefg","pageNumber":1,"pageSize":3,"token":"111111"}
      * 加密字段:{"jsonData":"eyJub3RpY2VUeXBlIjoxLCJhZ3RWZXIiOjEsImNsaWVudFZlciI6MSwiY2xpZW50VHlwZSI6MSwiY3RpbWUiOjIwMTkxMTA3MTgwMjk1OSwiY2N0aW1lIjoyMDE5MTEwNzE4MDI5NTksInNpZ24iOiJhYmNkZWZnIiwicGFnZU51bWJlciI6MSwicGFnZVNpemUiOjMsInRva2VuIjoiMTExMTExIn0="}
@@ -133,7 +133,7 @@ public class IssueController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/issue/getData
+     * local:http://localhost:8093/cake/issue/getData
      * 请求的属性类:RequestIssue
      * 必填字段:{"id":12,"agtVer":1,"clientVer":1,"clientType":1,"ctime":201911071802959,"cctime":201911071802959,"sign":"abcdefg","token":"111111"}
      * 加密字段:{"jsonData":"eyJpZCI6MTIsImFndFZlciI6MSwiY2xpZW50VmVyIjoxLCJjbGllbnRUeXBlIjoxLCJjdGltZSI6MjAxOTExMDcxODAyOTU5LCJjY3RpbWUiOjIwMTkxMTA3MTgwMjk1OSwic2lnbiI6ImFiY2RlZmciLCJ0b2tlbiI6IjExMTExMSJ9"}
@@ -198,7 +198,7 @@ public class IssueController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/issue/actionAdd
+     * local:http://localhost:8093/cake/issue/actionAdd
      * 请求的属性类:RequestIssue
      * 必填字段:{"outTradeNo":"outTradeNo1","orderMoney":"5000","bankName":"bankName1","bankCard":"bankCard1","accountName":"accountName1"}
      * 加密值:{"jsonData":"eyJvdXRUcmFkZU5vIjoib3V0VHJhZGVObzEiLCJvcmRlck1vbmV5IjoiNTAwMCIsImJhbmtOYW1lIjoiYmFua05hbWUxIiwiYmFua0NhcmQiOiJiYW5rQ2FyZDEiLCJhY2NvdW50TmFtZSI6ImFjY291bnROYW1lMSJ9"}
@@ -265,7 +265,7 @@ public class IssueController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/issue/actionUpdateCheck
+     * local:http://localhost:8093/cake/issue/actionUpdateCheck
      * 请求的属性类:RequestIssue
      * 必填字段:{"outTradeNo":"outTradeNo1","checkStatus":2,"checkInfo":"checkInfo1"}
      * 加密值:{"jsonData":"eyJvdXRUcmFkZU5vIjoib3V0VHJhZGVObzEiLCJvcmRlck1vbmV5IjoiNTAwMCIsImJhbmtOYW1lIjoiYmFua05hbWUxIiwiYmFua0NhcmQiOiJiYW5rQ2FyZDEiLCJhY2NvdW50TmFtZSI6ImFjY291bnROYW1lMSJ9"}

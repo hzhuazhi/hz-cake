@@ -80,7 +80,7 @@ public class OrderOutController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/orderOut/qrCode
+     * local:http://localhost:8093/cake/orderOut/qrCode
      * 请求的属性类:RequestOrder
      * 必填字段:{"money":"2000","payType":2,"outTradeNo":"outTradeNo1","inBankCard":"inBankCard1","inBankName":"inBankName1","inAccountName":"inAccountName1","notifyUrl":"notify_url","returnUrl":"http://www.baidu.com","secretKey":"秘钥_1"}
      * 加密字段:{"jsonData":"eyJtb25leSI6IjIwMDAiLCJwYXlUeXBlIjoyLCJvdXRUcmFkZU5vIjoib3V0VHJhZGVObzEiLCJpbkJhbmtDYXJkIjoiaW5CYW5rQ2FyZDEiLCJpbkJhbmtOYW1lIjoiaW5CYW5rTmFtZTEiLCJpbkFjY291bnROYW1lIjoiaW5BY2NvdW50TmFtZTEiLCJub3RpZnlVcmwiOiJub3RpZnlfdXJsIiwicmV0dXJuVXJsIjoiaHR0cDovL3d3dy5iYWlkdS5jb20iLCJzZWNyZXRLZXkiOiLnp5jpkqVfMiJ9"}

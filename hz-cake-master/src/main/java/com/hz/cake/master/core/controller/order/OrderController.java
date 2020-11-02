@@ -79,7 +79,7 @@ public class OrderController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/order/qrCode
+     * local:http://localhost:8093/cake/order/qrCode
      * 请求的属性类:RequestOrder
      * 必填字段:{"money":"1111","payType":2,"outTradeNo":"outTradeNo1","notifyUrl":"notify_url","returnUrl":"http://www.baidu.com","secretKey":"秘钥_7"}
      * 加密字段:{"jsonData":"eyJtb25leSI6IjExMTEiLCJwYXlUeXBlIjoyLCJvdXRUcmFkZU5vIjoib3V0VHJhZGVObzEiLCJub3RpZnlVcmwiOiJub3RpZnlfdXJsIiwicmV0dXJuVXJsIjoiaHR0cDovL3d3dy5iYWlkdS5jb20iLCJzZWNyZXRLZXkiOiLnp5jpkqVfNyJ9"}
@@ -275,7 +275,7 @@ public class OrderController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/order/getQrCode
+     * local:http://localhost:8093/cake/order/getQrCode
      * 请求的属性类:RequestOrder
      * 必填字段:{"orderNo":"order_no_3"}
      * 加密字段:{"jsonData":"eyJvcmRlck5vIjoiMjAyMDA5MTMxNjM1NTUwMDAwMDAxIn0="}
@@ -353,7 +353,7 @@ public class OrderController {
      * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
      * @author yoko
      * @date 2019/11/25 22:58
-     * local:http://localhost:8092/cake/order/getOrderStatus
+     * local:http://localhost:8093/cake/order/getOrderStatus
      * 请求的属性类:RequestOrder
      * 必填字段:{"orderNo":"202009131631330000001"}
      * 加密字段:{"jsonData":"eyJvcmRlck5vIjoiMjAyMDA5MTMxNjM1NTUwMDAwMDAxIn0="}
