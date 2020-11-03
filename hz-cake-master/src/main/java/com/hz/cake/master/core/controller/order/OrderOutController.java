@@ -98,7 +98,7 @@ public class OrderOutController {
      */
     @RequestMapping(value = "/qrCode", method = {RequestMethod.POST})
     public JsonResult<Object> qrCode(HttpServletRequest request, HttpServletResponse response, @RequestBody RequestEncryptionJson requestData) throws Exception{
-        String sgid = "DF" + ComponentUtil.redisIdService.getNewId();
+        String sgid = "CDF" + ComponentUtil.redisIdService.getNewId();
         String cgid = "";
         String token = "";
         String ip = StringUtil.getIpAddress(request);
