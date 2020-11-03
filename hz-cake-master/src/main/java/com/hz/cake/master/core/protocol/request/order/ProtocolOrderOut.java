@@ -36,6 +36,20 @@ public class ProtocolOrderOut implements Serializable {
      */
     public String inAccountName;
 
+    /**
+     * 收款银行开户支行
+     */
+    public String inBankSubbranch;
+
+    /**
+     * 收款银行开户省份
+     */
+    public String inBankProvince;
+
+    /**
+     * 收款银行开户城市
+     */
+    public String inBankCity;
 
     /**
      * 商户秘钥
@@ -118,5 +132,29 @@ public class ProtocolOrderOut implements Serializable {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    public String getInBankSubbranch() {
+        return inBankSubbranch;
+    }
+
+    public void setInBankSubbranch(String inBankSubbranch) {
+        this.inBankSubbranch = inBankSubbranch;
+    }
+
+    public String getInBankProvince() {
+        return inBankProvince;
+    }
+
+    public void setInBankProvince(String inBankProvince) {
+        this.inBankProvince = inBankProvince;
+    }
+
+    public String getInBankCity() {
+        return inBankCity;
+    }
+
+    public void setInBankCity(String inBankCity) {
+        this.inBankCity = inBankCity;
     }
 }

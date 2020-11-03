@@ -6,7 +6,8 @@
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
         a.id,a.alias,a.order_no,a.order_money,a.out_trade_no,a.order_status,a.order_type,a.service_charge,a.invalid_time,a.in_bank_card,
-        a.in_bank_name,a.in_account_name,a.out_bank_name,a.out_bank_card,a.out_account_name,a.merchant_id,a.merchant_name,a.merchant_site_id,a.merchant_site_name,
+        a.in_bank_name,a.in_account_name,a.in_bank_subbranch,a.in_bank_province,a.in_bank_city,
+        a.out_bank_name,a.out_bank_card,a.out_account_name,a.merchant_id,a.merchant_name,a.merchant_site_id,a.merchant_site_name,
         a.channel_id,a.channel_name,a.picture_ads,a.check_status,a.check_info,a.notify_url,a.operate_status,a.work_type,a.data_explain,
         a.remark,a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_user_id,a.create_role_id,a.update_user_id,a.update_role_id,
@@ -172,6 +173,15 @@
             <if test="inAccountName != null and inAccountName != '' " >
                 in_account_name,
             </if>
+            <if test="inBankSubbranch != null and inBankSubbranch != '' " >
+                in_bank_subbranch,
+            </if>
+            <if test="inBankProvince != null and inBankProvince != '' " >
+                in_bank_province,
+            </if>
+            <if test="inBankCity != null and inBankCity != '' " >
+                in_bank_city,
+            </if>
             <if test="outBankName != null and outBankName != '' " >
                 out_bank_name,
             </if>
@@ -280,6 +290,15 @@
             </if>
             <if test="inAccountName != null and inAccountName != '' " >
                 <![CDATA[  #{inAccountName}, ]]>
+            </if>
+            <if test="inBankSubbranch != null and inBankSubbranch != '' " >
+                <![CDATA[  #{inBankSubbranch}, ]]>
+            </if>
+            <if test="inBankProvince != null and inBankProvince != '' " >
+                <![CDATA[  #{inBankProvince}, ]]>
+            </if>
+            <if test="inBankCity != null and inBankCity != '' " >
+                <![CDATA[  #{inBankCity}, ]]>
             </if>
             <if test="outBankName != null and outBankName != '' " >
                 <![CDATA[  #{outBankName}, ]]>
@@ -393,6 +412,15 @@
             </if>
             <if test="inAccountName != null and inAccountName != '' " >
                 a.in_account_name = #{inAccountName},
+            </if>
+            <if test="inBankSubbranch != null and inBankSubbranch != '' " >
+                a.in_bank_subbranch = #{inBankSubbranch},
+            </if>
+            <if test="inBankProvince != null and inBankProvince != '' " >
+                a.in_bank_province = #{inBankProvince},
+            </if>
+            <if test="inBankCity != null and inBankCity != '' " >
+                a.in_bank_city = #{inBankCity},
             </if>
             <if test="outBankName != null and outBankName != '' " >
                 a.out_bank_name = #{outBankName},

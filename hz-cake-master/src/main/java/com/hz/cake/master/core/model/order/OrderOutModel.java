@@ -74,6 +74,21 @@ public class OrderOutModel extends BasePage implements Serializable {
     private String inAccountName;
 
     /**
+     * 收款银行开户支行
+     */
+    private String inBankSubbranch;
+
+    /**
+     * 收款银行开户省份
+     */
+    private String inBankProvince;
+
+    /**
+     * 收款银行开户城市
+     */
+    private String inBankCity;
+
+    /**
      * 付款银行名称/归属开户行
      */
     private String outBankName;
@@ -597,5 +612,29 @@ public class OrderOutModel extends BasePage implements Serializable {
 
     public void setServiceCharge(String serviceCharge) {
         this.serviceCharge = serviceCharge;
+    }
+
+    public String getInBankSubbranch() {
+        return inBankSubbranch;
+    }
+
+    public void setInBankSubbranch(String inBankSubbranch) {
+        this.inBankSubbranch = inBankSubbranch;
+    }
+
+    public String getInBankProvince() {
+        return inBankProvince;
+    }
+
+    public void setInBankProvince(String inBankProvince) {
+        this.inBankProvince = inBankProvince;
+    }
+
+    public String getInBankCity() {
+        return inBankCity;
+    }
+
+    public void setInBankCity(String inBankCity) {
+        this.inBankCity = inBankCity;
     }
 }
