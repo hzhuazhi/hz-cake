@@ -41,6 +41,7 @@ public class ComponentUtil {
     public static MerchantChannelService merchantChannelService;
     public static OrderOutService orderOutService;
     public static MerchantBalanceDeductService merchantBalanceDeductService;
+    public static MerchantServiceChargeService merchantServiceChargeService;
 
 
 
