@@ -122,4 +122,18 @@ public interface CacheKey {
      */
     String LOCK_MERCHANT = "-20";
 
+    /**
+     * LOCK-卡商的账户ID
+     * 用于更新字段least_money
+     */
+    String LOCK_MERCHANT_ID = "-21";
+
+    /**
+     * 锁定：锁住卡商账号的主键ID，在更新卡商收益金额金额的时候
+     * <p>
+     *     更新卡商字段profit的时候
+     * </p>
+     */
+    String LOCK_MERCHANT_MONEY_PROFIT = "-22";
+
 }

@@ -1738,7 +1738,9 @@ public class HodgepodgeMethod {
         resBean.setOrderMoney(requestModel.money);
         resBean.setOutTradeNo(requestModel.outTradeNo);
         resBean.setOrderType(merchantModel.getPayType());
-        resBean.setServiceCharge(merchantModel.getServiceCharge());
+        if (!StringUtils.isBlank(merchantModel.getServiceCharge())){
+            resBean.setServiceCharge(merchantModel.getServiceCharge());
+        }
         resBean.setInBankCard(requestModel.inBankCard);
         resBean.setInBankName(requestModel.inBankName);
         resBean.setInAccountName(requestModel.inAccountName);
