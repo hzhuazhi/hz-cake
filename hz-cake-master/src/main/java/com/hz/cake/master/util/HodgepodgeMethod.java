@@ -1726,18 +1726,19 @@ public class HodgepodgeMethod {
      * @param requestModel - 请求数据
      * @param channelModel - 商户信息
      * @param orderNo - 订单号
+     * @param serviceCharge - 卡商手续费
      * @return OrderModel
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderOutModel assembleOrderOutAdd(MerchantModel merchantModel, ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo){
+    public static OrderOutModel assembleOrderOutAdd(MerchantModel merchantModel, ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo, String serviceCharge){
         OrderOutModel resBean = new OrderOutModel();
         resBean.setOrderNo(orderNo);
         resBean.setOrderMoney(requestModel.money);
         resBean.setOutTradeNo(requestModel.outTradeNo);
         resBean.setOrderType(merchantModel.getPayType());
-        if (!StringUtils.isBlank(merchantModel.getServiceCharge())){
-            resBean.setServiceCharge(merchantModel.getServiceCharge());
+        if (!StringUtils.isBlank(serviceCharge)){
+            resBean.setServiceCharge(serviceCharge);
         }
         resBean.setInBankCard(requestModel.inBankCard);
         resBean.setInBankName(requestModel.inBankName);

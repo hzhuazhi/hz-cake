@@ -7,17 +7,13 @@ import com.hz.cake.master.core.common.utils.StringUtil;
 import com.hz.cake.master.core.common.utils.constant.ServerConstant;
 import com.hz.cake.master.core.model.RequestEncryptionJson;
 import com.hz.cake.master.core.model.ResponseEncryptionJson;
-import com.hz.cake.master.core.model.bank.BankModel;
-import com.hz.cake.master.core.model.channel.ChannelBankModel;
 import com.hz.cake.master.core.model.channel.ChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantModel;
-import com.hz.cake.master.core.model.order.OrderModel;
+import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.region.RegionModel;
-import com.hz.cake.master.core.model.strategy.StrategyData;
 import com.hz.cake.master.core.model.strategy.StrategyModel;
-import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
 import com.hz.cake.master.util.ComponentUtil;
 import com.hz.cake.master.util.HodgepodgeMethod;
@@ -167,8 +163,14 @@ public class OrderOutController {
             MerchantModel merchantData = ComponentUtil.orderOutService.screenMerchantByMoney(sortList, requestModel.money, sgid);
             HodgepodgeMethod.checkScreenMerchantsNull(merchantData);
 
+            String serviceCharge = "";// 卡商手续费
+            // 获取卡商绑定渠道的手续费
+            MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, merchantData.getId(), channelModel.getId(),1);
+            MerchantServiceChargeModel merchantServiceChargeModel = (MerchantServiceChargeModel)ComponentUtil.merchantServiceChargeService.findByObject(merchantServiceChargeQuery);
+            serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
+
             // 添加代付订单
-            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutAdd(merchantData, requestModel, channelModel, sgid);
+            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutAdd(merchantData, requestModel, channelModel, sgid, serviceCharge);
             int num = ComponentUtil.orderOutService.add(orderOutModel);
             HodgepodgeMethod.checkAddOrderOutIsOk(num);
 
