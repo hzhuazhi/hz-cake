@@ -3,6 +3,7 @@ package com.hz.cake.master.core.controller.order;
 import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.utils.JsonResult;
 import com.hz.cake.master.core.common.utils.StringUtil;
+import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.RequestOrder;
 import com.hz.cake.master.core.common.exception.ExceptionMethod;
@@ -118,6 +119,7 @@ public class OrderController {
                 requestModel.money = requestModel.money + ".00";
             }
 
+
             // 策略数据：出码开关
             StrategyModel strategyQrCodeSwitchQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.QR_CODE_SWITCH.getStgType());
             StrategyModel strategyQrCodeSwitchModel = ComponentUtil.strategyService.getStrategyModel(strategyQrCodeSwitchQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
@@ -232,8 +234,14 @@ public class OrderController {
             BankModel bankModel = ComponentUtil.orderService.screenBankByMoney(sortList, requestModel.money, requestModel.payType, orderMoneyLockTime, bankMoneyOut, strategyDataList);
             HodgepodgeMethod.checkScreenBankIsNull(bankModel);
 
+            String serviceCharge = "";// 卡商手续费
+            // 获取卡商绑定渠道的手续费
+            MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, bankModel.getMerchantId(), channelModel.getId(),1);
+            MerchantServiceChargeModel merchantServiceChargeModel = (MerchantServiceChargeModel)ComponentUtil.merchantServiceChargeService.findByObject(merchantServiceChargeQuery);
+            serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
+
             // 添加订单
-            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum);
+            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum, serviceCharge);
             int num = ComponentUtil.orderService.add(orderModel);
             HodgepodgeMethod.checkAddOrderIsOk(num);
 

@@ -2,8 +2,7 @@ package com.hz.cake.master.util;
 
 import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.utils.StringUtil;
-import com.hz.cake.master.core.model.merchant.MerchantBalanceDeductModel;
-import com.hz.cake.master.core.model.merchant.MerchantChannelModel;
+import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
@@ -28,8 +27,6 @@ import com.hz.cake.master.core.model.bank.BankModel;
 import com.hz.cake.master.core.model.channel.ChannelBankModel;
 import com.hz.cake.master.core.model.channel.ChannelModel;
 import com.hz.cake.master.core.model.issue.IssueModel;
-import com.hz.cake.master.core.model.merchant.MerchantModel;
-import com.hz.cake.master.core.model.merchant.MerchantRechargeModel;
 import com.hz.cake.master.core.model.mobilecard.MobileCardModel;
 import com.hz.cake.master.core.model.order.OrderModel;
 import com.hz.cake.master.core.model.region.RegionModel;
@@ -542,11 +539,12 @@ public class HodgepodgeMethod {
      * @param channelModel - 商户信息
      * @param orderNo - 订单号
      * @param invalidTimeNum - 策略中的失效时间
+     * @param serviceCharge - 卡商的手续费
      * @return OrderModel
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum){
+    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum, String serviceCharge){
         OrderModel resBean = new OrderModel();
         resBean.setOrderNo(orderNo);
         resBean.setBankId(bankModel.getId());
@@ -581,8 +579,8 @@ public class HodgepodgeMethod {
                 resBean.setChannelName(channelModel.getAlias());
             }
         }
-        if (!StringUtils.isBlank(bankModel.getServiceCharge())){
-            resBean.setServiceCharge(bankModel.getServiceCharge());
+        if (!StringUtils.isBlank(serviceCharge)){
+            resBean.setServiceCharge(serviceCharge);
         }
 
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
@@ -1825,6 +1823,54 @@ public class HodgepodgeMethod {
         dataModel.setStime(stime);
         dataModel.setSign(sign);
         return JSON.toJSONString(dataModel);
+    }
+
+
+    /**
+     * @Description: 组装查询卡商绑定渠道的手续费的方法
+     * @param id - 主键ID
+     * @param merchantId - 卡商ID
+     * @param channelId - 渠道ID
+     * @param useStatus - 使用状态:1初始化有效正常使用，2无效暂停使用
+     * @return com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel
+     * @author yoko
+     * @date 2020/11/26 15:04
+     */
+    public static MerchantServiceChargeModel assembleMerchantServiceChargeQuery(long id, long merchantId, long channelId, int useStatus){
+        MerchantServiceChargeModel resBean = new MerchantServiceChargeModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (merchantId > 0){
+            resBean.setMerchantId(merchantId);
+        }
+        if (channelId > 0){
+            resBean.setChannelId(channelId);
+        }
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 获取卡商的手续费
+     * @param merchantServiceChargeModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static String getMerchantServiceCharge(MerchantServiceChargeModel merchantServiceChargeModel){
+        String str = "";
+        if (merchantServiceChargeModel == null || merchantServiceChargeModel.getId() == null || merchantServiceChargeModel.getId() <= 0){
+            return str;
+        }else {
+            if (!StringUtils.isBlank(merchantServiceChargeModel.getServiceCharge())){
+                str = merchantServiceChargeModel.getServiceCharge();
+            }
+        }
+        return str;
     }
 
 
