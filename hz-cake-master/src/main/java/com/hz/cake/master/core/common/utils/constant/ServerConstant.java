@@ -96,6 +96,7 @@ public class ServerConstant {
         INVALID_TIME_NUM_BY_OUT_ORDER(11,""),
         OUT_QR_CODE_SWITCH(12,""),
         ORDER_OUT_MONEY_RANGE(13,""),
+        ISSUE_DISTRIBUTION(14,""),
 
 
 
