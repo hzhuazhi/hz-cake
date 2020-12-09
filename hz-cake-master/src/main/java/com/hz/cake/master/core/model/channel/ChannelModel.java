@@ -34,6 +34,11 @@ public class ChannelModel extends BasePage implements Serializable {
     private Integer bankBindingType;
 
     /**
+     * 渠道类型：1代收，2大包，3代付
+     */
+    private Integer channelType;
+
+    /**
      * 代收金额订单范围：每单代收的金额范围以“-”进行分割的
      */
     private String inMoneyRange;
@@ -181,5 +186,13 @@ public class ChannelModel extends BasePage implements Serializable {
 
     public void setInvalidTimeNum(Integer invalidTimeNum) {
         this.invalidTimeNum = invalidTimeNum;
+    }
+
+    public Integer getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(Integer channelType) {
+        this.channelType = channelType;
     }
 }

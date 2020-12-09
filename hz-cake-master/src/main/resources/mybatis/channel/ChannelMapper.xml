@@ -5,7 +5,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.alias,a.secret_key,a.bank_binding_type,a.in_money_range,a.out_money_range,a.money_lock_time,a.invalid_time_num,
+        a.id,a.alias,a.secret_key,a.bank_binding_type,a.channel_type,a.in_money_range,a.out_money_range,a.money_lock_time,a.invalid_time_num,
         a.remark,a.use_status,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -22,6 +22,9 @@
             </if>
             <if test="bankBindingType != null and bankBindingType != '' " >
                 and a.bank_binding_type = #{bankBindingType}
+            </if>
+            <if test="channelType != null and channelType != '' " >
+                and a.channel_type = #{channelType}
             </if>
             <if test="useStatus != null and useStatus != '' " >
                 and a.use_status = #{useStatus}
@@ -118,6 +121,9 @@
             <if test="bankBindingType != null and bankBindingType != '' " >
                 bank_binding_type,
             </if>
+            <if test="channelType != null and channelType != '' " >
+                channel_type,
+            </if>
             <if test="inMoneyRange != null and inMoneyRange != '' " >
                 in_money_range,
             </if>
@@ -148,6 +154,9 @@
             </if>
             <if test="bankBindingType != null and bankBindingType != '' " >
                 <![CDATA[  #{bankBindingType}, ]]>
+            </if>
+            <if test="channelType != null and channelType != '' " >
+                <![CDATA[  #{channelType}, ]]>
             </if>
             <if test="inMoneyRange != null and inMoneyRange != '' " >
                 <![CDATA[  #{inMoneyRange}, ]]>
@@ -183,6 +192,9 @@
             </if>
             <if test="bankBindingType != null and bankBindingType != '' " >
                 a.bank_binding_type = #{bankBindingType},
+            </if>
+            <if test="channelType != null and channelType != '' " >
+                a.channel_type = #{channelType},
             </if>
             <if test="inMoneyRange != null and inMoneyRange != '' " >
                 a.in_money_range = #{inMoneyRange},
