@@ -706,11 +706,12 @@ public class HodgepodgeMethod {
      * @param sign - 签名
      * @param orderModel - 用户派单的详情
      * @param shortChain - 短链
+     * @param payTime - 订单的支付时间
      * @return java.lang.String
      * @author yoko
      * @date 2019/11/25 22:45
      */
-    public static String assembleOrderByOrderNoDataResult(long stime, String sign, OrderModel orderModel, String shortChain) throws Exception{
+    public static String assembleOrderByOrderNoDataResult(long stime, String sign, OrderModel orderModel, String shortChain, int payTime) throws Exception{
         ResponseOrder dataModel = new ResponseOrder();
         if (orderModel != null){
             Order order = new Order();
@@ -733,6 +734,9 @@ public class HodgepodgeMethod {
             order.bankCode = orderModel.getBankCode();
             if (!StringUtils.isBlank(shortChain)){
                 order.shortChain = shortChain;
+            }
+            if (payTime > 0){
+                order.payTime = payTime;
             }
             dataModel.order = order;
         }

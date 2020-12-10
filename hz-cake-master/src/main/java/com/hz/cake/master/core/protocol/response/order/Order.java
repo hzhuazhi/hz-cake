@@ -81,6 +81,11 @@ public class Order implements Serializable {
      */
     public String shortChain;
 
+    /**
+     * 支付时间-单位分钟，在多少分钟之内支付完毕
+     */
+    public Integer payTime;
+
     public Order(){
 
     }
@@ -195,5 +200,13 @@ public class Order implements Serializable {
 
     public void setDifferenceMoney(String differenceMoney) {
         this.differenceMoney = differenceMoney;
+    }
+
+    public Integer getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(Integer payTime) {
+        this.payTime = payTime;
     }
 }

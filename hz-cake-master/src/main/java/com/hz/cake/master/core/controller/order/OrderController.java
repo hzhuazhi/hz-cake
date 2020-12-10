@@ -126,9 +126,10 @@ public class OrderController {
             HodgepodgeMethod.checkStrategyByQrCodeSwitch(strategyQrCodeSwitchModel);
 
             // 策略数据：出码金额范围
+            String  inMoneyRange = "";
             StrategyModel strategyOrderMoneyRangeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.ORDER_MONEY_RANGE.getStgType());
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
-            HodgepodgeMethod.checkOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
+//            HodgepodgeMethod.checkOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
 
             // 策略数据：出码后银行卡金额的锁定时间
             int orderMoneyLockTime = 0;
@@ -163,6 +164,28 @@ public class OrderController {
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkChannelIsNull(channelModel);
+
+            // 金额出码范围的check：如果渠道没有配置出码金额范围，则使用总策略的出码金额范围；如果渠道配置了出码金额范围，则使用渠道的出码金额范围
+            if (!StringUtils.isBlank(channelModel.getInMoneyRange())){
+                inMoneyRange = channelModel.getInMoneyRange();
+            }else{
+                inMoneyRange = strategyOrderMoneyRangeModel.getStgValue();
+            }
+
+            // check校验出码金额范围是否合规
+            HodgepodgeMethod.checkOrderMoney(inMoneyRange, requestModel.money);
+
+            // 赋值订单支付时间：如果渠道没有配置支付时间，则使用总策略的支付时间；如果渠道配置了支付时间，则使用渠道的支付时间
+            if (channelModel.getInvalidTimeNum() != null && channelModel.getInvalidTimeNum() > 0){
+                invalidTimeNum = channelModel.getInvalidTimeNum();
+            }
+
+            // 赋值出码后银行卡金额的锁定时间：如果渠道没有配置锁定时间，则使用总策略的锁定时间；如果渠道配置了锁定时间，则使用渠道的锁定时间
+            if (channelModel.getMoneyLockTime() != null && channelModel.getMoneyLockTime() > 0){
+                orderMoneyLockTime = channelModel.getMoneyLockTime();
+            }
+
+
 
 //            // 获取卡商集合：卡商的余额必须大于订单金额
 //            MerchantModel merchantQuery = HodgepodgeMethod.assembleMerchantQuery(0, requestModel.money, 1);
@@ -310,6 +333,13 @@ public class OrderController {
             // check校验请求的数据
             HodgepodgeMethod.checkOrderByQrCodeData(requestModel);
 
+            // 策略数据：出码后订单的支付时间
+            int invalidTimeNum = 0;
+            StrategyModel strategyInvalidTimeNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.INVALID_TIME_NUM.getStgType());
+            StrategyModel strategyInvalidTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyInvalidTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            invalidTimeNum = strategyInvalidTimeNumModel.getStgNumValue();
+
+
             // 策略数据：短链金额配置
             int shortChainMoney = 0;
             StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.SHORT_CHAIN_MONEY.getStgType());
@@ -325,6 +355,18 @@ public class OrderController {
             OrderModel orderQuery = HodgepodgeMethod.assembleOrderByOrderNoQuery(requestModel.orderNo, 1);
             OrderModel orderData = (OrderModel)ComponentUtil.orderService.findByObject(orderQuery);
 
+            if (orderData != null && orderData.getId() != null && orderData.getId() > 0){
+                // 获取渠道信息
+                ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(orderData.getChannelId(), null, 0);
+                ChannelModel channelModel = ComponentUtil.channelService.getChannelById(channelQuery, 0);
+                if (channelModel != null && channelModel.getId() != null){
+                    if (channelModel.getInvalidTimeNum() != null && channelModel.getInvalidTimeNum() > 0){
+                        invalidTimeNum = channelModel.getInvalidTimeNum();// 把渠道的支付时间进行赋值
+                    }
+                }
+            }
+
+
             // 生成短链
             String shortChain = "";
 //            String shortChain = HodgepodgeMethod.getShortChain(orderData, shortChainModel.getInterfaceAds(), shortChainMoney);
@@ -333,7 +375,7 @@ public class OrderController {
             // 组装返回客户端的数据
             long stime = System.currentTimeMillis();
             String sign = SignUtil.getSgin(stime, secretKeySign); // stime+秘钥=sign
-            String strData = HodgepodgeMethod.assembleOrderByOrderNoDataResult(stime, sign, orderData, shortChain);
+            String strData = HodgepodgeMethod.assembleOrderByOrderNoDataResult(stime, sign, orderData, shortChain, invalidTimeNum);
             // 数据加密
             String encryptionData = StringUtil.mergeCodeBase64(strData);
             ResponseEncryptionJson resultDataModel = new ResponseEncryptionJson();
