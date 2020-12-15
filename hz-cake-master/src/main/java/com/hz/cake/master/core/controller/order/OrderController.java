@@ -3,6 +3,8 @@ package com.hz.cake.master.core.controller.order;
 import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.utils.JsonResult;
 import com.hz.cake.master.core.common.utils.StringUtil;
+import com.hz.cake.master.core.model.bank.BankPoolModel;
+import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.RequestOrder;
@@ -103,7 +105,6 @@ public class OrderController {
         String token = "";
         String ip = StringUtil.getIpAddress(request);
         String data = "";
-        long did = 0;
         RegionModel regionModel = HodgepodgeMethod.assembleRegionModel(ip);
 
         ProtocolOrder requestModel = new ProtocolOrder();
@@ -207,18 +208,14 @@ public class OrderController {
             long maxBankId = 0;
 
             List<Long> bankIdList = null;
-            // 银行卡绑定类型：1无需绑定银行卡，2需要绑定银行卡
-            int bankBindingType = channelModel.getBankBindingType();
+            // 银行卡绑定类型：1需要绑定银行卡（一对一池子），2无需绑定银行卡（一对多），3银行卡池子
+            int bankBindingType = 0;
+            if (channelModel.getBankBindingType() == 1){
+                bankBindingType = 2;
+            }else if (channelModel.getBankBindingType() == 2){
+                bankBindingType = 1;
+            }
             if (bankBindingType == 1){
-                // 无需绑定银行卡
-
-                // 查询已经绑定的银行卡ID集合
-                ChannelBankModel channelBankQuery = HodgepodgeMethod.assembleChannelBankQuery(0,0,0,0);
-                bankIdList = ComponentUtil.channelBankService.getBankRelationList(channelBankQuery);
-
-                // 获取上次给出的银行卡ID
-                maxBankId = HodgepodgeMethod.getMaxBankByRedis(bankBindingType, 0);
-            }else if (bankBindingType == 2){
                 // 需要绑定银行卡
 
                 // 查询此渠道已绑定的银行卡ID集合
@@ -229,6 +226,43 @@ public class OrderController {
 
                 // 获取上次此渠道给出的银行卡ID
                 maxBankId = HodgepodgeMethod.getMaxBankByRedis(bankBindingType, channelModel.getId());
+
+            }else if (bankBindingType == 2){
+                // 无需绑定银行卡
+
+//                // 查询已经绑定的银行卡ID集合
+//                ChannelBankModel channelBankQuery = HodgepodgeMethod.assembleChannelBankQuery(0,0,0,0);
+//                bankIdList = ComponentUtil.channelBankService.getBankRelationList(channelBankQuery);
+//
+//                // 获取上次给出的银行卡ID
+//                maxBankId = HodgepodgeMethod.getMaxBankByRedis(bankBindingType, 0);
+
+
+                // 查询商户的银行卡池子已经绑定的银行卡ID集合
+                ChannelBankPoolModel channelBankPoolQuery = HodgepodgeMethod.assembleChannelBankPoolQuery(0,channelModel.getId(),0,1);
+                bankIdList = ComponentUtil.channelBankPoolService.getBankRelationList(channelBankPoolQuery);
+                if (bankIdList != null && bankIdList.size() != 0){
+                    bankBindingType = 2;
+
+                    // 获取上次给出的银行卡ID：这个渠道在一对多的池子有多张银行卡
+                    maxBankId = HodgepodgeMethod.getMaxBankByRedis(bankBindingType, channelModel.getId());
+                }else{
+                    // 查询银行卡池子的银行卡ID集合
+                    BankPoolModel bankPoolQuery = HodgepodgeMethod.assembleBankPoolQuery(0,0,1);
+                    bankIdList = ComponentUtil.bankPoolService.getBankIdList(bankPoolQuery);
+                    if (bankIdList != null && bankIdList.size() != 0){
+                        bankBindingType = 3;
+
+                        // 获取上次给出的银行卡ID
+                        maxBankId = HodgepodgeMethod.getMaxBankByRedis(bankBindingType, 0);
+                    }
+                }
+
+                // 校验池子是否有可用的银行卡ID集合
+                HodgepodgeMethod.checkBankPoolIsNull(bankIdList);
+
+
+
             }
 
 //            // 获取商户与银行卡绑定关系的集合
@@ -264,7 +298,7 @@ public class OrderController {
             serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
 
             // 添加订单
-            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum, serviceCharge);
+            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum, serviceCharge, bankBindingType);
             int num = ComponentUtil.orderService.add(orderModel);
             HodgepodgeMethod.checkAddOrderIsOk(num);
 

@@ -2,6 +2,8 @@ package com.hz.cake.master.util;
 
 import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.utils.StringUtil;
+import com.hz.cake.master.core.model.bank.BankPoolModel;
+import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
@@ -427,16 +429,19 @@ public class HodgepodgeMethod {
             BigDecimal bd = new BigDecimal(orderMoney);
             resBean.setMoney(bd);
         }
-        if (bankBindingType == 1){
-            // 无需绑定银行卡
-            if (bankIdList != null && bankIdList.size() > 0){
-                resBean.setNoBankIdList(bankIdList);
-            }
-        }else if (bankBindingType == 2){
-            // 需要绑定银行卡
-            if (bankIdList != null && bankIdList.size() > 0){
-                resBean.setYesBankIdList(bankIdList);
-            }
+//        if (bankBindingType == 1){
+//            // 无需绑定银行卡
+//            if (bankIdList != null && bankIdList.size() > 0){
+//                resBean.setNoBankIdList(bankIdList);
+//            }
+//        }else if (bankBindingType == 2){
+//            // 需要绑定银行卡
+//            if (bankIdList != null && bankIdList.size() > 0){
+//                resBean.setYesBankIdList(bankIdList);
+//            }
+//        }
+        if (bankIdList != null && bankIdList.size() > 0){
+            resBean.setYesBankIdList(bankIdList);
         }
         return resBean;
     }
@@ -544,7 +549,7 @@ public class HodgepodgeMethod {
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum, String serviceCharge){
+    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum, String serviceCharge, int bankPoolType){
         OrderModel resBean = new OrderModel();
         resBean.setOrderNo(orderNo);
         resBean.setBankId(bankModel.getId());
@@ -581,6 +586,9 @@ public class HodgepodgeMethod {
         }
         if (!StringUtils.isBlank(serviceCharge)){
             resBean.setServiceCharge(serviceCharge);
+        }
+        if (bankPoolType > 0){
+            resBean.setBankPoolType(bankPoolType);
         }
 
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
@@ -1373,7 +1381,7 @@ public class HodgepodgeMethod {
      * @date 2020/10/10 15:44
      */
     public static void saveMaxBankByRedis(int bankBindingType, long channelId, long bankId){
-        if (bankBindingType == 1){
+        if (bankBindingType == 3){
             channelId = 0;
         }
         String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.BANK_BINDING_TYPE, bankBindingType, channelId);
@@ -1876,6 +1884,72 @@ public class HodgepodgeMethod {
             }
         }
         return str;
+    }
+
+
+    /**
+     * @Description: 组装查询商户的银行卡池子的查询方法
+     * @param id - 主键ID
+     * @param channelId - 商户ID
+     * @param bankId - 银行卡ID
+     * @param useStatus - 使用状态
+     * @return MerchantModel
+     * @author yoko
+     * @date 2020/9/9 17:16
+     */
+    public static ChannelBankPoolModel assembleChannelBankPoolQuery(long id, long channelId, long bankId, int useStatus){
+        ChannelBankPoolModel resBean = new ChannelBankPoolModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (channelId > 0){
+            resBean.setChannelId(channelId);
+        }
+        if (bankId > 0){
+            resBean.setBankId(bankId);
+        }
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询银行卡池子的查询方法
+     * @param id - 主键ID
+     * @param bankId - 银行卡ID
+     * @param useStatus - 使用状态
+     * @return MerchantModel
+     * @author yoko
+     * @date 2020/9/9 17:16
+     */
+    public static BankPoolModel assembleBankPoolQuery(long id, long bankId, int useStatus){
+        BankPoolModel resBean = new BankPoolModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (bankId > 0){
+            resBean.setBankId(bankId);
+        }
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: check校验池子中银行卡ID集合是否为空
+     * @param bankIdList
+     * @return
+     * @author yoko
+     * @date 2020/9/12 20:19
+     */
+    public static void checkBankPoolIsNull(List<Long> bankIdList) throws Exception{
+        if (bankIdList == null || bankIdList.size() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00019.geteCode(), ErrorCode.ENUM_ERROR.OR00019.geteDesc());
+        }
     }
 
 
