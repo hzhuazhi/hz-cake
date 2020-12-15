@@ -132,6 +132,16 @@ public class OrderModel extends BasePage implements Serializable {
     private String channelName;
 
     /**
+     * 手续费
+     */
+    private String serviceCharge;
+
+    /**
+     * 银行卡池子类型:1一对一池子，2一对多池子，3银行卡池子
+     */
+    private Integer bankPoolType;
+
+    /**
      * 是否是补单：1初始化不是补单，2是补单
      */
     private Integer replenishType;
@@ -217,10 +227,7 @@ public class OrderModel extends BasePage implements Serializable {
      */
     private String orderStatusStr;
 
-    /**
-     * 手续费
-     */
-    private String serviceCharge;
+
 
     public OrderModel(){
 
@@ -552,5 +559,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setServiceCharge(String serviceCharge) {
         this.serviceCharge = serviceCharge;
+    }
+
+    public Integer getBankPoolType() {
+        return bankPoolType;
+    }
+
+    public void setBankPoolType(Integer bankPoolType) {
+        this.bankPoolType = bankPoolType;
     }
 }

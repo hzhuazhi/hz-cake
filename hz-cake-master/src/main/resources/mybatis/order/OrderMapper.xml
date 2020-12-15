@@ -9,7 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.bank_id,a.order_no,a.order_type,a.order_money,a.distribution_money,a.qr_code,a.out_trade_no,a.order_status,
         a.invalid_time,a.notify_url,a.bank_name,a.bank_card,a.account_name,a.bank_code,a.mobile_card_id,
-        a.phone_num,a.merchant_id,a.merchant_name,a.merchant_site_id,a.card_site_name,a.channel_id,a.channel_name,a.service_charge,
+        a.phone_num,a.merchant_id,a.merchant_name,a.merchant_site_id,a.card_site_name,a.channel_id,a.channel_name,a.service_charge,a.bank_pool_type,
         a.replenish_type,a.work_type,
         a.data_explain,a.remark,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
@@ -208,6 +208,9 @@
             <if test="serviceCharge != null and serviceCharge != '' " >
                 service_charge,
             </if>
+            <if test="bankPoolType != null and bankPoolType != '' " >
+                bank_pool_type,
+            </if>
             <if test="replenishType != null and replenishType != '' " >
                 replenish_type,
             </if>
@@ -301,6 +304,9 @@
             </if>
             <if test="serviceCharge != null and serviceCharge != '' " >
                 <![CDATA[  #{serviceCharge}, ]]>
+            </if>
+            <if test="bankPoolType != null and bankPoolType != '' " >
+                <![CDATA[  #{bankPoolType}, ]]>
             </if>
             <if test="replenishType != null and replenishType != '' " >
                 <![CDATA[  #{replenishType}, ]]>
@@ -396,6 +402,12 @@
             </if>
             <if test="channelName != null and channelName != '' " >
                 a.channel_name = #{channelName},
+            </if>
+            <if test="serviceCharge != null and serviceCharge != '' " >
+                a.service_charge = #{serviceCharge},
+            </if>
+            <if test="bankPoolType != null and bankPoolType != '' " >
+                a.bank_pool_type = #{bankPoolType},
             </if>
             <if test="replenishType != null and replenishType != '' " >
                 a.replenish_type = #{replenishType},
