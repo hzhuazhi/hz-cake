@@ -125,6 +125,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private BankPoolService bankPoolService;
 
+    @Autowired
+    private StatisticsIpService statisticsIpService;
+
 
 
 
@@ -169,6 +172,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.merchantServiceChargeService = merchantServiceChargeService;
         ComponentUtil.channelBankPoolService = channelBankPoolService;
         ComponentUtil.bankPoolService = bankPoolService;
+        ComponentUtil.statisticsIpService = statisticsIpService;
 
         runThread = new RunThread();
         runThread.start();

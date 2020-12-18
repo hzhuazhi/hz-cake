@@ -97,6 +97,8 @@ public class ServerConstant {
         OUT_QR_CODE_SWITCH(12,""),
         ORDER_OUT_MONEY_RANGE(13,""),
         ISSUE_DISTRIBUTION(14,""),
+        BALANCE_KEY(15,""),
+        BLACKLIST_IP(16,""),
 
 
 

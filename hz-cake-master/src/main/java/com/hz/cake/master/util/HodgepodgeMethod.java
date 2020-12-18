@@ -6,6 +6,7 @@ import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
+import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
@@ -1954,6 +1955,62 @@ public class HodgepodgeMethod {
 
 
 
+    /**
+     * @Description: 组装支付用户的IP页统计的数据
+     * @param requestModel - 前端传的订单信息
+     * @param regionModel - 用户的地域信息
+     * @return
+     * @author yoko
+     * @date 2020/7/15 19:10
+     */
+    public static StatisticsIpModel assembleStatisticsIpData(RequestOrder requestModel, RegionModel regionModel){
+        StatisticsIpModel resBean = new StatisticsIpModel();
+        if (!StringUtils.isBlank(requestModel.orderNo)){
+            resBean.setOrderNo(requestModel.orderNo);
+        }else {
+            return null;
+        }
+        if (regionModel != null){
+            if (!StringUtils.isBlank(regionModel.getIp())){
+                regionModel = ComponentUtil.regionService.getCacheRegion(regionModel);
+                resBean.setIp(regionModel.getIp());
+                log.info("");
+                if (!StringUtils.isBlank(regionModel.getProvince())){
+                    resBean.setProvince(regionModel.getProvince());
+                }
+                if (!StringUtils.isBlank(regionModel.getCity())){
+                    resBean.setCity(regionModel.getCity());
+                }
+            }
+        }
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: check用户IP是否在黑名单IP中
+     * @param blacklistIp - 黑名单IP
+     * @param ip - 用户IP
+     * @return boolean
+     * @author yoko
+     * @date 2020/12/18 16:27
+     */
+    public static boolean checkBlacklistIp(String blacklistIp, String ip){
+        if (!StringUtils.isBlank(blacklistIp) && !StringUtils.isBlank(ip)){
+            if (blacklistIp.indexOf(ip) > -1){
+                return false;
+            }else{
+                return true;
+            }
+        }else {
+            return true;
+        }
+    }
+
+
+
 
 
 
@@ -1982,6 +2039,10 @@ public class HodgepodgeMethod {
 //        String sb4 = "500.00";
         String sb5 = StringUtil.getBigDecimalSubtractByStr(sb3, sb4).replace("-", "");
         System.out.println("sb5:" + sb5);
+        String ipList = "1.2.127.255,1.2.5.255,1.8.8.255";
+        String ip = "1.2.5.255";
+        boolean flag_ip = checkBlacklistIp(ipList, ip);
+        System.out.println("flag_ip:" + flag_ip);
 
 
     }

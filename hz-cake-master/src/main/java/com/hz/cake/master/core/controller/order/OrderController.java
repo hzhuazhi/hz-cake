@@ -6,6 +6,7 @@ import com.hz.cake.master.core.common.utils.StringUtil;
 import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
+import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.RequestOrder;
 import com.hz.cake.master.core.common.exception.ExceptionMethod;
@@ -112,6 +113,7 @@ public class OrderController {
             // 解密
             data = StringUtil.decoderBase64(requestData.jsonData);
             requestModel  = JSON.parseObject(data, ProtocolOrder.class);
+
 
             // check校验数据
             HodgepodgeMethod.checkOrderAdd(requestModel);
@@ -358,6 +360,9 @@ public class OrderController {
     public JsonResult<Object> getQrCode(HttpServletRequest request, HttpServletResponse response, @RequestBody RequestEncryptionJson requestData) throws Exception{
         String data = "";
 
+        String ip = StringUtil.getIpAddress(request);
+        RegionModel regionModel = HodgepodgeMethod.assembleRegionModel(ip);
+
         RequestOrder requestModel = new RequestOrder();
         try{
             // 解密
@@ -367,11 +372,22 @@ public class OrderController {
             // check校验请求的数据
             HodgepodgeMethod.checkOrderByQrCodeData(requestModel);
 
+            // 获取地域信息
+            regionModel = HodgepodgeMethod.getRegion(regionModel);
+
             // 策略数据：出码后订单的支付时间
             int invalidTimeNum = 0;
             StrategyModel strategyInvalidTimeNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.INVALID_TIME_NUM.getStgType());
             StrategyModel strategyInvalidTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyInvalidTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             invalidTimeNum = strategyInvalidTimeNumModel.getStgNumValue();
+
+
+            // 策略数据：黑名单IP
+            String blacklistIp = "";
+            StrategyModel strategyBlacklistIpQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.BLACKLIST_IP.getStgType());
+            StrategyModel strategyBlacklistIpModel = ComponentUtil.strategyService.getStrategyModel(strategyBlacklistIpQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            blacklistIp = strategyBlacklistIpModel.getStgBigValue();
+            boolean flag_ip = HodgepodgeMethod.checkBlacklistIp(blacklistIp, ip);
 
 
             // 策略数据：短链金额配置
@@ -386,8 +402,13 @@ public class OrderController {
 
 
             // 收款账号详情数据
-            OrderModel orderQuery = HodgepodgeMethod.assembleOrderByOrderNoQuery(requestModel.orderNo, 1);
-            OrderModel orderData = (OrderModel)ComponentUtil.orderService.findByObject(orderQuery);
+            OrderModel orderData = null;
+            if (flag_ip){
+                // 被限制住的黑名单IP，不能查到订单信息
+                OrderModel orderQuery = HodgepodgeMethod.assembleOrderByOrderNoQuery(requestModel.orderNo, 1);
+                orderData = (OrderModel)ComponentUtil.orderService.findByObject(orderQuery);
+            }
+
 
             if (orderData != null && orderData.getId() != null && orderData.getId() > 0){
                 // 获取渠道信息
@@ -405,6 +426,12 @@ public class OrderController {
             String shortChain = "";
 //            String shortChain = HodgepodgeMethod.getShortChain(orderData, shortChainModel.getInterfaceAds(), shortChainMoney);
 //            String shortChain = ShortChainUtil.getShortChainH5Url(shortChainModel.getInterfaceAds());
+
+            // 添加支付页的用户IP统计数据
+            StatisticsIpModel statisticsIpModel = HodgepodgeMethod.assembleStatisticsIpData(requestModel, regionModel);
+            if (statisticsIpModel != null){
+                ComponentUtil.statisticsIpService.add(statisticsIpModel);
+            }
 
             // 组装返回客户端的数据
             long stime = System.currentTimeMillis();
