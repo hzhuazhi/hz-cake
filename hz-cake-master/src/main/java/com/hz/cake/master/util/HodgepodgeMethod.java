@@ -7,6 +7,7 @@ import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
+import com.hz.cake.master.core.model.strategy.StrategyData;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
@@ -1368,6 +1369,8 @@ public class HodgepodgeMethod {
             }else{
                 num = 2;
             }
+        }else if(bankMoneyOut == 5){
+            num = 3;// 随机减
         }
         return num;
     }
@@ -2043,6 +2046,80 @@ public class HodgepodgeMethod {
         String ip = "1.2.5.255";
         boolean flag_ip = checkBlacklistIp(ipList, ip);
         System.out.println("flag_ip:" + flag_ip);
+
+        StrategyData bean1 = new StrategyData();
+        bean1.setId(1L);
+        bean1.setStgValue("0.01");
+
+        StrategyData bean2 = new StrategyData();
+        bean2.setId(2L);
+        bean2.setStgValue("0.02");
+
+        StrategyData bean3 = new StrategyData();
+        bean3.setId(3L);
+        bean3.setStgValue("0.03");
+
+        StrategyData bean4 = new StrategyData();
+        bean4.setId(4L);
+        bean4.setStgValue("0.04");
+
+        StrategyData bean5 = new StrategyData();
+        bean5.setId(5L);
+        bean5.setStgValue("0.05");
+
+        StrategyData bean6 = new StrategyData();
+        bean6.setId(6L);
+        bean6.setStgValue("0.06");
+
+        StrategyData bean7 = new StrategyData();
+        bean7.setId(7L);
+        bean7.setStgValue("0.07");
+
+        StrategyData bean8 = new StrategyData();
+        bean8.setId(8L);
+        bean8.setStgValue("0.08");
+
+        StrategyData bean9 = new StrategyData();
+        bean9.setId(9L);
+        bean9.setStgValue("0.09");
+
+        StrategyData bean10 = new StrategyData();
+        bean10.setId(10L);
+        bean10.setStgValue("0.10");
+
+        List<StrategyData> list = new ArrayList<>();
+        list.add(bean1);
+        list.add(bean2);
+        list.add(bean3);
+        list.add(bean4);
+        list.add(bean5);
+        list.add(bean6);
+        list.add(bean7);
+        list.add(bean8);
+        list.add(bean9);
+        list.add(bean10);
+//        for (int i = 0; i<=100; i++){
+//            int random = new Random().nextInt(list.size());
+//            System.out.println("ID:"+ list.get(random).getId() + ",value:" + list.get(random).getStgValue());
+//        }
+
+        int count = 0;
+        while (true){
+            System.out.println("count:" + count);
+            if (count <= 6){
+                System.out.println("count1111:" + count);
+                int random = new Random().nextInt(list.size());
+                System.out.println("random:" + random);
+                if (random == 3){
+                    break;
+                }
+            }else {
+                System.out.println("超过次数了");
+                break;
+            }
+            count ++;
+        }
+
 
 
     }

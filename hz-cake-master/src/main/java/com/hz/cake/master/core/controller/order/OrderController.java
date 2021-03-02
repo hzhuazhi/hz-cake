@@ -147,7 +147,7 @@ public class OrderController {
             invalidTimeNum = strategyInvalidTimeNumModel.getStgNumValue();
 
 
-            // 策略数据：银行卡金额给出策略（浮动：动态：1为减，2加，3随机加减，4为整数）
+            // 策略数据：银行卡金额给出策略（浮动：动态：1为减，2加，3随机加减，4为整数，5为随机数）
             int bankMoneyOut = 0;
             StrategyModel strategyBankMoneyOutQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.BANK_MONEY_OUT.getStgType());
             StrategyModel strategyBankMoneyOutModel = ComponentUtil.strategyService.getStrategyModel(strategyBankMoneyOutQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);

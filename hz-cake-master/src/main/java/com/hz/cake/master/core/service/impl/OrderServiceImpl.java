@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,7 +77,7 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         BankModel bankModel = null;
         if (bankMoneyOut != 4){
             // 属于小数点金额
-            int addAndSubtract = 0;// 金额加减：1表示减，2表示加
+            int addAndSubtract = 0;// 金额加减：1表示减，2表示加，3表示减（筛选随机数）
             addAndSubtract = HodgepodgeMethod.getAddAndSubtract(bankMoneyOut);
             String money = "";
             if (addAndSubtract == 1){
@@ -101,6 +102,26 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
                         }
                     }
                 }
+            }else if(addAndSubtract == 3){
+                // 金额相减：从金额列表中随意一个数进行相减
+                for (BankModel bankData : bankList){
+                    int count = 0;// 防止死循环，最多循环次数
+                    while (true){
+                        if (count <= 3){
+                            int random = new Random().nextInt(moneyList.size());
+                            money = StringUtil.getBigDecimalSubtractByStr(orderMoney, moneyList.get(random).getStgValue());
+                            bankModel = getBankData(bankData, money, payType, orderMoneyLockTime);
+                            if (bankModel != null && bankModel.getId() != null && bankModel.getId() > 0){
+                                return bankModel;
+                            }
+                        }else {
+                            break;
+                        }
+                        count ++;
+                    }
+
+                }
+
             }
         }else {
             // 属于整数金额
