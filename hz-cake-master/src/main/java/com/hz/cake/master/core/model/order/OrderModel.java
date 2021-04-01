@@ -152,6 +152,11 @@ public class OrderModel extends BasePage implements Serializable {
     private Integer workType;
 
     /**
+     * 自动下线检测时间：银行卡自动下线使用此时间去抓取订单进行自动下线判断
+     */
+    private String downTime;
+
+    /**
      * 数据说明：做解说用的
      */
     private String dataExplain;
@@ -567,5 +572,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setBankPoolType(Integer bankPoolType) {
         this.bankPoolType = bankPoolType;
+    }
+
+    public String getDownTime() {
+        return downTime;
+    }
+
+    public void setDownTime(String downTime) {
+        this.downTime = downTime;
     }
 }

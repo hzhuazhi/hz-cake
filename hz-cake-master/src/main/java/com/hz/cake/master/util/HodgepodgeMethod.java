@@ -421,11 +421,12 @@ public class HodgepodgeMethod {
      * @param orderMoney - 订单金额
      * @param bankBindingType - 银行卡绑定类型：1无需绑定银行卡，2需要绑定银行卡
      * @param bankIdList - 银行卡ID集合
+     * @param bankUpAndDownSwitch - 自动上下线银行卡开关：1关闭自动上下线卡，2打开自动上下线卡
      * @return
      * @author yoko
      * @date 2020/9/12 20:15
     */
-    public static BankModel assembleBankByOrderQuery(String orderMoney, int bankBindingType, List<Long> bankIdList){
+    public static BankModel assembleBankByOrderQuery(String orderMoney, int bankBindingType, List<Long> bankIdList, int bankUpAndDownSwitch){
         BankModel resBean = new BankModel();
         if (!StringUtils.isBlank(orderMoney)){
             BigDecimal bd = new BigDecimal(orderMoney);
@@ -444,6 +445,9 @@ public class HodgepodgeMethod {
 //        }
         if (bankIdList != null && bankIdList.size() > 0){
             resBean.setYesBankIdList(bankIdList);
+        }
+        if (bankUpAndDownSwitch == 2){
+            resBean.setBankUpAndDownSwitch(2);
         }
         return resBean;
     }
@@ -547,11 +551,13 @@ public class HodgepodgeMethod {
      * @param orderNo - 订单号
      * @param invalidTimeNum - 策略中的失效时间
      * @param serviceCharge - 卡商的手续费
+     * @param bankDownTimeNum - 自动上下卡检测卡订单失败率的延迟时间
      * @return OrderModel
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum, String serviceCharge, int bankPoolType){
+    public static OrderModel assembleOrderAdd(BankModel bankModel, ProtocolOrder requestModel, ChannelModel channelModel, String orderNo, int invalidTimeNum, String serviceCharge, int bankPoolType,
+                                              int bankDownTimeNum){
         OrderModel resBean = new OrderModel();
         resBean.setOrderNo(orderNo);
         resBean.setBankId(bankModel.getId());
@@ -562,6 +568,8 @@ public class HodgepodgeMethod {
         // 订单失效时间
         String invalidTime = DateUtil.addDateMinute(invalidTimeNum);
         resBean.setInvalidTime(invalidTime);
+        String downTime = DateUtil.addDateMinute(bankDownTimeNum);
+        resBean.setDownTime(downTime);
         resBean.setNotifyUrl(requestModel.notifyUrl);
         resBean.setBankName(bankModel.getBankName());
         resBean.setBankCard(bankModel.getBankCard());

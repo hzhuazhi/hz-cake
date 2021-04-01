@@ -153,6 +153,19 @@ public class OrderController {
             StrategyModel strategyBankMoneyOutModel = ComponentUtil.strategyService.getStrategyModel(strategyBankMoneyOutQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             bankMoneyOut = strategyBankMoneyOutModel.getStgNumValue();
 
+
+            // 策略：获取自动上下线银行卡开关
+            StrategyModel strategyBankUpAndDownSwitchQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.BANK_UP_AND_DOWN_SWITCH.getStgType());
+            StrategyModel strategyBankUpAndDownSwitchModel = ComponentUtil.strategyService.getStrategyModel(strategyBankUpAndDownSwitchQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            int bankUpAndDownSwitch = strategyBankUpAndDownSwitchModel.getStgNumValue();
+
+
+            // 策略数据：自动下线卡订单计算失败延迟时间
+            int bankDownTimeNum = 0;
+            StrategyModel strategyBankDownTimeNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.BANK_DOWN_TIME.getStgType());
+            StrategyModel strategyBankDownTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyBankDownTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            bankDownTimeNum = strategyBankDownTimeNumModel.getStgNumValue();
+
             if (requestModel.payType == 3){
                 // 卡转卡，银行卡金额给出策略强制成整数
                 bankMoneyOut = 4;
@@ -278,7 +291,7 @@ public class OrderController {
 //            }
 
             // 获取银行卡以及银行卡的放量策略数据
-            BankModel bankByOrderQuery = HodgepodgeMethod.assembleBankByOrderQuery(requestModel.money, bankBindingType, bankIdList);
+            BankModel bankByOrderQuery = HodgepodgeMethod.assembleBankByOrderQuery(requestModel.money, bankBindingType, bankIdList, bankUpAndDownSwitch);
             List<BankModel> bankList = ComponentUtil.bankService.getBankAndStrategy(bankByOrderQuery);
             HodgepodgeMethod.checkBankIsNull(bankList);
 
@@ -300,7 +313,7 @@ public class OrderController {
             serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
 
             // 添加订单
-            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum, serviceCharge, bankBindingType);
+            OrderModel orderModel = HodgepodgeMethod.assembleOrderAdd(bankModel, requestModel, channelModel, sgid, invalidTimeNum, serviceCharge, bankBindingType, bankDownTimeNum);
             int num = ComponentUtil.orderService.add(orderModel);
             HodgepodgeMethod.checkAddOrderIsOk(num);
 

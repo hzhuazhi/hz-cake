@@ -50,6 +50,11 @@ public class BankModel extends BasePage implements Serializable {
     private Long merchantSiteId;
 
     /**
+     * 原始卡卡号：原始卡的卡号，也可以填原始卡的尾号
+     */
+    private String leadBankCard;
+
+    /**
      * 银行名称/归属开户行
      */
     private String bankName;
@@ -144,6 +149,26 @@ public class BankModel extends BasePage implements Serializable {
      * 使用状态:1初始化有效正常使用，2无效暂停使用
      */
     private Integer useStatus;
+
+    /**
+     * 换卡状态：1初始化，2待换卡（成功10多单后、或者后面订单连续几单未成功），3驳回（上线连续几单都未成功），4换卡完毕
+     */
+    private Integer changeStatus;
+
+    /**
+     * 换卡时间：比如卡在2021-03-29 18:29:47下线，但是挂了有订单不允许立即让人换卡，在此时间延迟几分钟在换卡
+     */
+    private String changeTime;
+
+    /**
+     * 检测换卡：检测卡的原因说明，比如连续失败，等。。
+     */
+    private String checkChange;
+
+    /**
+     * 绑定的手机设备号
+     */
+    private String phoneDeviceNum;
 
     /**
      * 创建时间
@@ -281,6 +306,12 @@ public class BankModel extends BasePage implements Serializable {
      * 手续费
      */
     private String serviceCharge;
+
+
+    /**
+     * 自动上下线银行卡开关：1关闭自动上下线卡，2打开自动上下线卡
+     */
+    private Integer bankUpAndDownSwitch;
 
     public Long getId() {
         return id;
@@ -690,5 +721,53 @@ public class BankModel extends BasePage implements Serializable {
 
     public void setServiceCharge(String serviceCharge) {
         this.serviceCharge = serviceCharge;
+    }
+
+    public String getLeadBankCard() {
+        return leadBankCard;
+    }
+
+    public void setLeadBankCard(String leadBankCard) {
+        this.leadBankCard = leadBankCard;
+    }
+
+    public Integer getChangeStatus() {
+        return changeStatus;
+    }
+
+    public void setChangeStatus(Integer changeStatus) {
+        this.changeStatus = changeStatus;
+    }
+
+    public String getChangeTime() {
+        return changeTime;
+    }
+
+    public void setChangeTime(String changeTime) {
+        this.changeTime = changeTime;
+    }
+
+    public String getCheckChange() {
+        return checkChange;
+    }
+
+    public void setCheckChange(String checkChange) {
+        this.checkChange = checkChange;
+    }
+
+    public String getPhoneDeviceNum() {
+        return phoneDeviceNum;
+    }
+
+    public void setPhoneDeviceNum(String phoneDeviceNum) {
+        this.phoneDeviceNum = phoneDeviceNum;
+    }
+
+    public Integer getBankUpAndDownSwitch() {
+        return bankUpAndDownSwitch;
+    }
+
+    public void setBankUpAndDownSwitch(Integer bankUpAndDownSwitch) {
+        this.bankUpAndDownSwitch = bankUpAndDownSwitch;
     }
 }
