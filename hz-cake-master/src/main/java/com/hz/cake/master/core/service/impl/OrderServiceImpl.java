@@ -138,6 +138,11 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return null;
     }
 
+    @Override
+    public int updateTransferUserByOrderNo(OrderModel model) {
+        return orderMapper.updateTransferUserByOrderNo(model);
+    }
+
     /**
      * @Description: check校验被筛选的银行卡的使用状态
      * @param bankModel - 银行卡数据

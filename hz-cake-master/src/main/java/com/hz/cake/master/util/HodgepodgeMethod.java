@@ -2021,6 +2021,105 @@ public class HodgepodgeMethod {
     }
 
 
+    /**
+     * @Description: check校验数据更新订单的转账用户
+     * @param requestModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static void checkUpdateTransferUserData(RequestOrder requestModel) throws Exception{
+        // 1.校验所有数据
+        if (requestModel == null ){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00020.geteCode(), ErrorCode.ENUM_ERROR.OR00020.geteDesc());
+        }
+
+        if (StringUtils.isBlank(requestModel.orderNo)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00021.geteCode(), ErrorCode.ENUM_ERROR.OR00021.geteDesc());
+        }
+
+        if (!StringUtils.isBlank(requestModel.transferUser)){
+            if (requestModel.transferUser.length() >= 15){
+                throw new ServiceException(ErrorCode.ENUM_ERROR.OR00022.geteCode(), ErrorCode.ENUM_ERROR.OR00022.geteDesc());
+            }
+        }else {
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00023.geteCode(), ErrorCode.ENUM_ERROR.OR00023.geteDesc());
+        }
+    }
+
+
+
+    /**
+     * @Description: 更新订单的转账用户时，判断用户是否频繁操作
+     * <p>
+     *     从缓存中获取IP，如果缓存中有此IP数据则表示操作过于频繁
+     * </p>
+     * @param ip - 转账用户的IP
+     * @return
+     * @author yoko
+     * @date 2020/5/21 15:38
+     */
+    public static void checkUpdateTransferUserIpByRedis(String ip) throws Exception{
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.TRANSFER_USER_IP, ip);
+        String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
+        if (!StringUtils.isBlank(strCache)) {
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00024.geteCode(), ErrorCode.ENUM_ERROR.OR00024.geteDesc());
+        }
+    }
+
+
+
+    /**
+     * @Description: redis：更新订单的转账用户时，添加IP
+     * @param ip - 转账用户的IP
+     * @return void
+     * @author yoko
+     * @date 2020/10/10 15:44
+     */
+    public static void saveUpdateTransferUserIpByRedis(String ip){
+        if (!StringUtils.isBlank(ip)){
+            String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.TRANSFER_USER_IP, ip);
+            ComponentUtil.redisService.set(strKeyCache, ip, 5L);
+        }
+    }
+
+
+    /**
+     * @Description: 更新订单的转账用户时,check校验订单信息
+     * @param orderModel - 转账用户的IP
+     * @return
+     * @author yoko
+     * @date 2020/5/21 15:38
+     */
+    public static void checkOrderByUpdateTransferUser(OrderModel orderModel) throws Exception{
+        if (orderModel != null && orderModel.getId() != null && orderModel.getId() > 0){
+            if (orderModel.getOrderStatus() != 1){
+                throw new ServiceException(ErrorCode.ENUM_ERROR.OR00025.geteCode(), ErrorCode.ENUM_ERROR.OR00025.geteDesc());
+            }
+        }else{
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OR00026.geteCode(), ErrorCode.ENUM_ERROR.OR00026.geteDesc());
+        }
+    }
+
+
+    /**
+     * @Description: 组装更新订单的转账人的信息
+     * @param orderNo - 订单号
+     * @param orderStatus - 订单状态
+     * @param transferUser - 转账人
+     * @return com.hz.cake.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2021/5/6 16:22
+     */
+    public static OrderModel assembleOrderByUpdateTransferUser(String orderNo, int orderStatus, String transferUser){
+        OrderModel resBean = new OrderModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderStatus(orderStatus);
+        resBean.setTransferUser(transferUser);
+        return resBean;
+    }
+
+
 
 
 

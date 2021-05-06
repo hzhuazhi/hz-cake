@@ -52,4 +52,14 @@ public interface OrderService<T> extends BaseService<T> {
      * @date 2020/9/12 20:49
      */
     public BankModel screenBankByMoney(List<BankModel> bankList, String orderMoney, int payType, int orderMoneyLockTime, int bankMoneyOut, List<StrategyData> moneyList);
+
+    
+    /**
+     * @Description: 更新订单的转账人信息
+     * @param model - 订单信息
+     * @return 
+     * @author yoko
+     * @date 2021/5/6 16:15 
+    */
+    public int updateTransferUserByOrderNo(OrderModel model);
 }

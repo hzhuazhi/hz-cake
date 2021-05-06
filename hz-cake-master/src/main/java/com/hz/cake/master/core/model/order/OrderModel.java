@@ -137,6 +137,11 @@ public class OrderModel extends BasePage implements Serializable {
     private String serviceCharge;
 
     /**
+     * 转账用户：用户转账的银行归属名字
+     */
+    private String transferUser;
+
+    /**
      * 银行卡池子类型:1一对一池子，2一对多池子，3银行卡池子
      */
     private Integer bankPoolType;
@@ -580,5 +585,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setDownTime(String downTime) {
         this.downTime = downTime;
+    }
+
+    public String getTransferUser() {
+        return transferUser;
+    }
+
+    public void setTransferUser(String transferUser) {
+        this.transferUser = transferUser;
     }
 }

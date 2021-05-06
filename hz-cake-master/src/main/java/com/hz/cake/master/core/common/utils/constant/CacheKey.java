@@ -141,4 +141,9 @@ public interface CacheKey {
      */
     String CHANNEL_ID = "-23";
 
+    /**
+     * 转账用户的IP
+     */
+    String TRANSFER_USER_IP = "-24";
+
 }

@@ -19,6 +19,11 @@ public class RequestOrder extends BaseRequest implements Serializable {
      */
     public String orderNo;
 
+    /**
+     * 转账用户：用户转账的银行归属名字
+     */
+    public String transferUser;
+
     public RequestOrder(){
 
     }
@@ -29,5 +34,13 @@ public class RequestOrder extends BaseRequest implements Serializable {
 
     public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
+    }
+
+    public String getTransferUser() {
+        return transferUser;
+    }
+
+    public void setTransferUser(String transferUser) {
+        this.transferUser = transferUser;
     }
 }

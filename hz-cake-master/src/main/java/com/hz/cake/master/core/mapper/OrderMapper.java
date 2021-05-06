@@ -23,4 +23,13 @@ public interface OrderMapper<T> extends BaseDao<T> {
      */
     public int getOrderStatus(OrderModel model);
 
+    /**
+     * @Description: 更新订单的转账人信息
+     * @param model - 订单信息
+     * @return
+     * @author yoko
+     * @date 2021/5/6 16:15
+     */
+    public int updateTransferUserByOrderNo(OrderModel model);
+
 }

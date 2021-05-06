@@ -533,4 +533,84 @@ public class OrderController {
         }
     }
 
+
+
+    /**
+     * @Description: 更新订单的转账用户
+     * @param request
+     * @param response
+     * @return com.gd.chain.common.utils.JsonResult<java.lang.Object>
+     * @author yoko
+     * @date 2019/11/25 22:58
+     * local:http://localhost:8093/cake/order/updateTransferUser
+     * 请求的属性类:RequestOrder
+     * 必填字段:{"orderNo":"202009131631330000001", "transferUser": "张三"}
+     * 加密字段:{"jsonData":"eyJvcmRlck5vIjoiQ0RTMjAyMTA0MDExNTQzMTExIiwgInRyYW5zZmVyVXNlciI6ICLlvKDkuIkifQ=="}
+     * 客户端加密字段:id+ctime+cctime+秘钥=sign
+     * 服务端加密字段:stime+秘钥=sign
+     * result={
+     *     "resultCode": "0",
+     *     "message": "success",
+     *     "data": {
+     *         "jsonData": "eyJvcmRlclN0YXR1cyI6MX0="
+     *     }
+     * }
+     */
+    @RequestMapping(value = "/updateTransferUser", method = {RequestMethod.POST})
+    public JsonResult<Object> updateTransferUser(HttpServletRequest request, HttpServletResponse response, @RequestBody RequestEncryptionJson requestData) throws Exception{
+        String ip = StringUtil.getIpAddress(request);
+        String data = "";
+
+        RequestOrder requestModel = new RequestOrder();
+        try{
+            // 解密
+            data = StringUtil.decoderBase64(requestData.jsonData);
+            requestModel  = JSON.parseObject(data, RequestOrder.class);
+
+            // check校验请求的数据
+            HodgepodgeMethod.checkUpdateTransferUserData(requestModel);
+
+            // 校验IP是否频繁操作
+            HodgepodgeMethod.checkUpdateTransferUserIpByRedis(ip);
+
+
+            // 查询订单信息
+            OrderModel orderQuery = HodgepodgeMethod.assembleOrderByOrderNoQuery(requestModel.orderNo,0);
+            OrderModel orderModel = (OrderModel)ComponentUtil.orderService.findByObject(orderQuery);
+            // check校验订单信息
+            HodgepodgeMethod.checkOrderByUpdateTransferUser(orderModel);
+
+            // 正式更新转账人姓名
+            OrderModel orderUpdate = HodgepodgeMethod.assembleOrderByUpdateTransferUser(requestModel.orderNo, 1, requestModel.transferUser);
+            ComponentUtil.orderService.updateTransferUserByOrderNo(orderUpdate);
+
+            // 组装返回客户端的数据
+            long stime = System.currentTimeMillis();
+            String sign = SignUtil.getSgin(stime, secretKeySign); // stime+秘钥=sign
+            String strData = HodgepodgeMethod.assembleResult(stime, null, sign);
+            // 数据加密
+            String encryptionData = StringUtil.mergeCodeBase64(strData);
+            ResponseEncryptionJson resultDataModel = new ResponseEncryptionJson();
+            resultDataModel.jsonData = encryptionData;
+
+            // 添加转账人IP
+            HodgepodgeMethod.saveUpdateTransferUserIpByRedis(ip);
+
+            // 返回数据给客户端
+            return JsonResult.successResult(resultDataModel);
+        }catch (Exception e){
+            // 添加转账人IP
+            HodgepodgeMethod.saveUpdateTransferUserIpByRedis(ip);
+
+            Map<String,String> map = ExceptionMethod.getException(e, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
+            // 添加异常
+            log.error(String.format("this OrderController.updateTransferUser() is error , the data=%s!", data));
+            if (!StringUtils.isBlank(map.get("dbCode"))){
+                log.error(String.format("this OrderController.updateTransferUser() is error codeInfo, the dbCode=%s and dbMessage=%s !", map.get("dbCode"), map.get("dbMessage")));
+            }
+            e.printStackTrace();
+            return JsonResult.failedResult(map.get("message"), map.get("code"));
+        }
+    }
+
 }
