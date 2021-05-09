@@ -756,6 +756,9 @@ public class HodgepodgeMethod {
             if (payTime > 0){
                 order.payTime = payTime;
             }
+            if (!StringUtils.isBlank(orderModel.getTransferUser())){
+                order.transferUser = orderModel.getTransferUser();
+            }
             dataModel.order = order;
         }
         dataModel.setStime(stime);

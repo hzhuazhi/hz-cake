@@ -143,6 +143,26 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return orderMapper.updateTransferUserByOrderNo(model);
     }
 
+
+
+
+    @Override
+    public BankModel screenBankNotLockMoney(List<BankModel> bankList, String orderMoney, int payType) {
+        BankModel bankModel = null;
+        for (BankModel bankData : bankList){
+            bankModel = getBankDataNotLockMoney(bankData, orderMoney, payType);
+            if (bankModel != null && bankModel.getId() != null && bankModel.getId() > 0){
+                return bankModel;
+            }
+        }
+        return null;
+    }
+
+
+
+
+
+
     /**
      * @Description: check校验被筛选的银行卡的使用状态
      * @param bankModel - 银行卡数据
@@ -261,6 +281,43 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
             str = strCache;
             return str;
         }
+    }
+
+
+
+
+    /**
+     * @Description: check校验被筛选的银行卡的使用状态：不锁定金额
+     * @param bankModel - 银行卡数据
+     * @param orderMoney - 订单金额
+     * @param payType - 支付类型
+     * @return BankModel
+     * @author yoko
+     * @date 2020/9/12 21:02
+     */
+    public BankModel getBankDataNotLockMoney(BankModel bankModel, String orderMoney, int payType){
+        // 判断此银行卡是否被锁住
+        String lockKey_bank = CachedKeyUtils.getCacheKey(CacheKey.LOCK_BANK, bankModel.getId());
+        boolean flagLock_bank = ComponentUtil.redisIdService.lock(lockKey_bank);
+        if (flagLock_bank){
+            // 校验银行卡是否受到收款限制
+            boolean flag = checkBankLimit(bankModel, payType);
+            if (flag){
+                if (!StringUtils.isBlank(bankModel.getOpenTimeSlot())){
+                    // 校验银行卡的放量时间
+                    boolean flag_openTime = HodgepodgeMethod.checkOpenTimeSlot(bankModel.getOpenTimeSlot());
+                    if (flag_openTime){
+                        // 解锁
+                        ComponentUtil.redisIdService.delLock(lockKey_bank);
+                        bankModel.setDistributionMoney(orderMoney);// 赋值实际派发的金额
+                        return bankModel;
+                    }
+                }
+            }
+            // 解锁
+            ComponentUtil.redisIdService.delLock(lockKey_bank);
+        }
+        return null;
     }
 
 

@@ -62,4 +62,16 @@ public interface OrderService<T> extends BaseService<T> {
      * @date 2021/5/6 16:15 
     */
     public int updateTransferUserByOrderNo(OrderModel model);
+
+
+    /**
+     * @Description: 不锁定金额：筛选可用的银行卡
+     * @param bankList - 银行卡集合
+     * @param orderMoney - 订单金额
+     * @param payType - 支付类型
+     * @return
+     * @author yoko
+     * @date 2020/9/12 20:49
+     */
+    public BankModel screenBankNotLockMoney(List<BankModel> bankList, String orderMoney, int payType);
 }

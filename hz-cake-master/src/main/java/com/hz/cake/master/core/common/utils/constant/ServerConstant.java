@@ -106,7 +106,11 @@ public class ServerConstant {
         BANK_DOWN_BY_FAIL_NUM(20,""),
         BANK_DOWN_SHOW_TIME(21,""),
         BANK_DOWN_TIME(22,""),
+        BANK_DOWN_BY_NOT_CHANNEL(23,""),
         //自动上下线-end
+        BLACKLIST_NAME(24,""),
+        BANK_UP_RULE(25,""),
+        IS_LOCK_MONEY(26,""),
 
 
 

@@ -166,6 +166,14 @@ public class OrderController {
             StrategyModel strategyBankDownTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyBankDownTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             bankDownTimeNum = strategyBankDownTimeNumModel.getStgNumValue();
 
+
+            // 策略数据：派单是否锁金额
+            int isLockMoney = 0;// 派单是否锁金额：1锁金额，2不锁金额
+            StrategyModel strategyIsLockMoneyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.IS_LOCK_MONEY.getStgType());
+            StrategyModel strategyIsLockMoneyModel = ComponentUtil.strategyService.getStrategyModel(strategyIsLockMoneyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            isLockMoney = strategyIsLockMoneyModel.getStgNumValue();
+
+
             if (requestModel.payType == 3){
                 // 卡转卡，银行卡金额给出策略强制成整数
                 bankMoneyOut = 4;
@@ -301,9 +309,15 @@ public class OrderController {
 
 //            // 区分出与银行卡绑定关系以及未绑定关系
 //            List<BankModel> bankAllList = HodgepodgeMethod.assembleBankByPriority(bankList, bankIdList, bankOutType);
+            BankModel bankModel = null;
+            if (isLockMoney == 1){
+                // 锁定金额：筛选可用的银行卡
+                bankModel = ComponentUtil.orderService.screenBankByMoney(sortList, requestModel.money, requestModel.payType, orderMoneyLockTime, bankMoneyOut, strategyDataList);
+            }else if (isLockMoney == 2){
+                // 无需锁定金额：筛选可用的银行卡
+                bankModel = ComponentUtil.orderService.screenBankNotLockMoney(sortList, requestModel.money, requestModel.payType);
+            }
 
-            // 筛选可用的银行卡
-            BankModel bankModel = ComponentUtil.orderService.screenBankByMoney(sortList, requestModel.money, requestModel.payType, orderMoneyLockTime, bankMoneyOut, strategyDataList);
             HodgepodgeMethod.checkScreenBankIsNull(bankModel);
 
             String serviceCharge = "";// 卡商手续费

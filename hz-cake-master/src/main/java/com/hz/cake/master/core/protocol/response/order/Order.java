@@ -86,6 +86,11 @@ public class Order implements Serializable {
      */
     public Integer payTime;
 
+    /**
+     * 转账用户：用户转账的银行归属名字
+     */
+    public String transferUser;
+
     public Order(){
 
     }
@@ -208,5 +213,13 @@ public class Order implements Serializable {
 
     public void setPayTime(Integer payTime) {
         this.payTime = payTime;
+    }
+
+    public String getTransferUser() {
+        return transferUser;
+    }
+
+    public void setTransferUser(String transferUser) {
+        this.transferUser = transferUser;
     }
 }
