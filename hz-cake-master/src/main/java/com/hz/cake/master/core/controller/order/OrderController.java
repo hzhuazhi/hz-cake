@@ -174,10 +174,10 @@ public class OrderController {
             isLockMoney = strategyIsLockMoneyModel.getStgNumValue();
 
 
-            if (requestModel.payType == 3){
-                // 卡转卡，银行卡金额给出策略强制成整数
-                bankMoneyOut = 4;
-            }
+//            if (requestModel.payType == 3){
+//                // 卡转卡，银行卡金额给出策略强制成整数
+//                bankMoneyOut = 4;
+//            }
 
             // 解析金额列表的值
             List<StrategyData> strategyDataList = JSON.parseArray(strategyBankMoneyOutModel.getStgBigValue(), StrategyData.class);

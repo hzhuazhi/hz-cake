@@ -45,7 +45,11 @@ public class ComponentUtil {
     public static ChannelBankPoolService channelBankPoolService;
     public static BankPoolService bankPoolService;
     public static StatisticsIpService statisticsIpService;
-
+    public static ReplacePayService replacePayService;
+    public static ReplacePayStrategyService replacePayStrategyService;
+    public static ReplacePayInfoService replacePayInfoService;
+    public static ReplacePayGainService replacePayGainService;
+    public static ReplacePayGainResultService replacePayGainResultService;
 
 
 }

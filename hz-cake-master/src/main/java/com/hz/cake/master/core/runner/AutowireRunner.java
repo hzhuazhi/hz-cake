@@ -128,6 +128,21 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private StatisticsIpService statisticsIpService;
 
+    @Autowired
+    private static ReplacePayService replacePayService;
+
+    @Autowired
+    private static ReplacePayStrategyService replacePayStrategyService;
+
+    @Autowired
+    private static ReplacePayInfoService replacePayInfoService;
+
+    @Autowired
+    private static ReplacePayGainService replacePayGainService;
+
+    @Autowired
+    private static ReplacePayGainResultService replacePayGainResultService;
+
 
 
 
@@ -173,6 +188,11 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.channelBankPoolService = channelBankPoolService;
         ComponentUtil.bankPoolService = bankPoolService;
         ComponentUtil.statisticsIpService = statisticsIpService;
+        ComponentUtil.replacePayService = replacePayService;
+        ComponentUtil.replacePayStrategyService = replacePayStrategyService;
+        ComponentUtil.replacePayInfoService = replacePayInfoService;
+        ComponentUtil.replacePayGainService = replacePayGainService;
+        ComponentUtil.replacePayGainResultService = replacePayGainResultService;
 
         runThread = new RunThread();
         runThread.start();
