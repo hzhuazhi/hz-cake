@@ -6,6 +6,8 @@ import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
+import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
+import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
 import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
 import com.hz.cake.master.core.model.strategy.StrategyData;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 
 /**
@@ -2124,6 +2127,242 @@ public class HodgepodgeMethod {
 
 
 
+    /**
+     * @Description: 获取上一次使用过的代付ID
+     * <p>
+     *     从缓存中获取上次给出码的代付ID
+     *     数据来由：每次给出之后，把代付ID进行纪录
+     * </p>
+     * @return
+     * @author yoko
+     * @date 2020/5/21 15:38
+     */
+    public static long getMaxReplacePayRedis() throws Exception{
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY);
+        String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
+        if (!StringUtils.isBlank(strCache)) {
+            return Long.parseLong(strCache);
+        }else{
+            return 0;
+        }
+    }
+
+
+    /**
+     * @Description: 组装查询代付的查询条件
+     * @param merchantList - 卡商集合
+     * @param orderMoney - 订单金额
+     * @return com.hz.cake.master.core.model.replacepay.ReplacePayModel
+     * @author yoko
+     * @date 2021/6/21 11:05
+     */
+    public static ReplacePayModel assembleReplacePayQuery(List<MerchantModel> merchantList, String orderMoney){
+        ReplacePayModel resBean = new ReplacePayModel();
+        List<Long> merchantIdList = merchantList.stream().map(MerchantModel::getId).collect(Collectors.toList());
+        resBean.setMerchantIdList(merchantIdList);
+        BigDecimal bd = new BigDecimal(orderMoney);
+        resBean.setMoney(bd);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        return resBean;
+    }
+
+
+
+    /**
+     * @Description: check校验代付集合是否为空
+     * @param replacePayList
+     * @return
+     * @author yoko
+     * @date 2020/10/30 14:12
+     */
+    public static void checkReplacePayIsNullByOutOrder(List<ReplacePayModel> replacePayList) throws Exception{
+        if (replacePayList == null || replacePayList.size() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00011.geteCode(), ErrorCode.ENUM_ERROR.OU00011.geteDesc());
+        }
+    }
+
+
+
+    /**
+     * @Description: 代付集合排序
+     * <p>
+     *     排序方式：小于上次给过的代付ID放在集合的后面，大于上次给过的代付ID放集合的前面
+     * </p>
+     * @param replacePayList - 代付集合
+     * @param maxreplacePayRuleId - 上次给出的代付ID
+     * @return java.util.List<ReplacePayModel>
+     * @author yoko
+     * @date 2020/10/10 11:49
+     */
+    public static List<ReplacePayModel> sortReplacePayList(List<ReplacePayModel> replacePayList, long maxreplacePayRuleId){
+        if (maxreplacePayRuleId > 0){
+            List<ReplacePayModel> resList = new ArrayList<>();
+            List<ReplacePayModel> noList = new ArrayList<>();// 没有给出过出码的代付集合
+            List<ReplacePayModel> yesList = new ArrayList<>();// 有给出过出码的代付集合
+            for (ReplacePayModel replacePayModel : replacePayList){
+                if (replacePayModel.getId() > maxreplacePayRuleId){
+                    noList.add(replacePayModel);
+                }else {
+                    yesList.add(replacePayModel);
+                }
+            }
+            if (noList != null && noList.size() > 0){
+                resList.addAll(noList);
+            }
+            if (yesList != null && yesList.size() > 0){
+                resList.addAll(yesList);
+            }
+            return resList;
+        }else {
+            return replacePayList;
+        }
+    }
+
+
+
+
+    /**
+     * @Description: 组装衫德代付订单的方法
+     * @param requestModel - 请求数据
+     * @param orderNo - 订单号
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutSand(ProtocolOrderOut requestModel, String orderNo){
+        OrderOutModel resBean = new OrderOutModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        if (!StringUtils.isBlank(requestModel.inBankSubbranch)){
+            resBean.setInBankSubbranch(requestModel.inBankSubbranch);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankProvince)){
+            resBean.setInBankProvince(requestModel.inBankProvince);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankCity)){
+            resBean.setInBankCity(requestModel.inBankCity);
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+
+        resBean.setTradeTime(String.valueOf(System.currentTimeMillis()));
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+
+    /**
+     * @Description: check筛选的代付是否为空
+     * @param replacePayModel
+     * @return
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static void checkScreenReplacePayNull(ReplacePayModel replacePayModel) throws Exception{
+        if (replacePayModel == null || replacePayModel.getId() == null || replacePayModel.getId() <= 0){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00012.geteCode(), ErrorCode.ENUM_ERROR.OU00012.geteDesc());
+        }
+    }
+
+
+
+
+    /**
+     * @Description: 组装添加代付订单的方法-衫德代付
+     * @param orderOutModel - 代付订单信息-部分信息
+     * @param replacePayModel - 代付信息
+     * @param merchantList - 卡商集合
+     * @param channelModel - 商户信息
+     * @param serviceCharge - 卡商手续费
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutBySandAdd(OrderOutModel orderOutModel, ReplacePayModel replacePayModel, List<MerchantModel> merchantList, ChannelModel channelModel, String serviceCharge){
+        OrderOutModel resBean = new OrderOutModel();
+        resBean = orderOutModel;
+
+        MerchantModel merchantModel = null;
+        for (MerchantModel merchantData : merchantList){
+            if (merchantData.getId() == replacePayModel.getMerchantId()){
+                merchantModel = merchantData;
+            }
+        }
+        resBean.setOrderType(merchantModel.getPayType());
+        if (!StringUtils.isBlank(serviceCharge)){
+            resBean.setServiceCharge(serviceCharge);
+        }
+        resBean.setMerchantId(merchantModel.getId());
+        if (!StringUtils.isBlank(merchantModel.getAcName())){
+            resBean.setMerchantName(merchantModel.getAcName());
+        }
+        resBean.setChannelId(channelModel.getId());
+        if (!StringUtils.isBlank(channelModel.getAlias())){
+            resBean.setChannelName(channelModel.getAlias());
+        }
+        resBean.setOrderType(2);// 订单类型：1手动转账，2API转账
+        resBean.setHandleType(2);// 订单处理类型：1我方处理，2第三方处理
+        resBean.setOutStatus(2);// 代付订单出码状态:1初始化（我方处理默认初始化），2出码成功（第三方反馈结果），3出码失败
+        resBean.setReplacePayId(replacePayModel.getId());
+        resBean.setReplacePayName(replacePayModel.getAlias());
+
+        return resBean;
+    }
+
+
+    /**
+     * @Description: redis：添加给出的代付ID
+     * @param replacePayId - 代付ID
+     * @return void
+     * @author yoko
+     * @date 2020/10/10 15:44
+     */
+    public static void saveMaxreplacePayByRedis(long replacePayId){
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY, replacePayId);
+        ComponentUtil.redisService.set(strKeyCache, String.valueOf(replacePayId));
+    }
+
+
+    /**
+     * @Description: 组装主动拉取订单结果的数据
+     * @param orderOutModel - 代付订单信息
+     * @param replacePayModel - 代付信息
+     * @return com.hz.cake.master.core.model.replacepay.ReplacePayGainModel
+     * @author yoko
+     * @date 2021/6/22 13:49
+     */
+    public static ReplacePayGainModel assembleReplacePayGainAdd(OrderOutModel orderOutModel, ReplacePayModel replacePayModel){
+        ReplacePayGainModel resBean = new ReplacePayGainModel();
+        resBean.setReplacePayId(replacePayModel.getId());
+        resBean.setOrderNo(orderOutModel.getOrderNo());
+        resBean.setOrderMoney(orderOutModel.getOrderMoney());
+        resBean.setTradeTime(Long.parseLong(orderOutModel.getTradeTime()));
+
+        if (replacePayModel.getGainDataTimeType() == 1){
+
+        }
+        String next_time = DateUtil.addDateMinute(1);
+        resBean.setNextTime(next_time);
+        resBean.setNowGainDataTime("1");// 默认1的话，下次取时间则是代付的第一个时间位
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+
+
+
 
 
 
@@ -2228,6 +2467,45 @@ public class HodgepodgeMethod {
                 break;
             }
             count ++;
+        }
+
+
+        ReplacePayModel sbean1 = new ReplacePayModel();
+        sbean1.setId(1L);
+        sbean1.setDayMoney("100.00");
+
+        ReplacePayModel sbean2 = new ReplacePayModel();
+        sbean2.setId(2L);
+        sbean2.setDayMoney("0.00");
+
+        ReplacePayModel sbean3 = new ReplacePayModel();
+        sbean3.setId(3L);
+        sbean3.setDayMoney("100.03");
+
+        ReplacePayModel sbean4 = new ReplacePayModel();
+        sbean4.setId(4L);
+        sbean4.setDayMoney("400.00");
+
+        ReplacePayModel sbean5 = new ReplacePayModel();
+        sbean5.setId(5L);
+        sbean5.setDayMoney("0.00");
+
+        ReplacePayModel sbean6 = new ReplacePayModel();
+        sbean6.setId(6L);
+        sbean6.setDayMoney("600.00");
+
+        List<ReplacePayModel> replacePayList = new ArrayList<>();
+        replacePayList.add(sbean1);
+        replacePayList.add(sbean2);
+        replacePayList.add(sbean3);
+        replacePayList.add(sbean4);
+        replacePayList.add(sbean5);
+        replacePayList.add(sbean6);
+
+        replacePayList.sort((x, y) -> Double.compare(Double.parseDouble(x.getDayMoney()), Double.parseDouble(y.getDayMoney())));
+
+        for (ReplacePayModel replacePayModel : replacePayList) {
+            System.out.println("replacePayModel.id:" + replacePayModel.getId() + ", replacePayModel.dayMoney:" + replacePayModel.getDayMoney());
         }
 
 

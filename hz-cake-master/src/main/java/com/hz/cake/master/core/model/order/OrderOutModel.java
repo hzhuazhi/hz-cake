@@ -149,6 +149,11 @@ public class OrderOutModel extends BasePage implements Serializable {
     private Long replacePayId;
 
     /**
+     * 代付名称
+     */
+    private String replacePayName;
+
+    /**
      *上游订单号：供应商订单号、对接放的订单号
      */
     private String supplierTradeNo;
@@ -714,5 +719,13 @@ public class OrderOutModel extends BasePage implements Serializable {
 
     public void setSupplierServiceCharge(String supplierServiceCharge) {
         this.supplierServiceCharge = supplierServiceCharge;
+    }
+
+    public String getReplacePayName() {
+        return replacePayName;
+    }
+
+    public void setReplacePayName(String replacePayName) {
+        this.replacePayName = replacePayName;
     }
 }

@@ -5,6 +5,8 @@ import com.hz.cake.master.core.common.exception.ServiceException;
 import com.hz.cake.master.core.common.service.impl.BaseServiceImpl;
 import com.hz.cake.master.core.common.utils.constant.CacheKey;
 import com.hz.cake.master.core.common.utils.constant.CachedKeyUtils;
+import com.hz.cake.master.core.common.utils.sandpay.method.AgentPay;
+import com.hz.cake.master.core.common.utils.sandpay.model.AgentPayResponse;
 import com.hz.cake.master.core.mapper.MerchantBalanceDeductMapper;
 import com.hz.cake.master.core.mapper.MerchantMapper;
 import com.hz.cake.master.core.mapper.OrderOutMapper;
@@ -12,6 +14,7 @@ import com.hz.cake.master.core.model.channel.ChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantBalanceDeductModel;
 import com.hz.cake.master.core.model.merchant.MerchantModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
+import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
 import com.hz.cake.master.core.service.OrderOutService;
 import com.hz.cake.master.util.ComponentUtil;
@@ -74,6 +77,26 @@ public class OrderOutServiceImpl<T> extends BaseServiceImpl<T> implements OrderO
                 return merchantModel;
             }
         }
+        return null;
+    }
+
+    @Override
+    public ReplacePayModel screenReplacePay(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception {
+        ReplacePayModel replacePayModel = null;
+        for (ReplacePayModel replacePayData : replacePayList){
+            // 删选代付，调用衫德代付
+            replacePayModel = getReplacePayData(replacePayData, orderOutModel);
+            if (replacePayModel != null && replacePayModel.getId() != null && replacePayModel.getId() > 0){
+                // 扣除此卡商的余额
+                for (MerchantModel merchantData : merchantList){
+                    if (merchantData.getId() == replacePayModel.getMerchantId()){
+                        getMerchantData(merchantData, orderOutModel.getOrderMoney(), orderOutModel.getOrderNo());
+                    }
+                }
+                return replacePayModel;
+            }
+        }
+
         return null;
     }
 
@@ -148,6 +171,97 @@ public class OrderOutServiceImpl<T> extends BaseServiceImpl<T> implements OrderO
         }else {
             throw new ServiceException("handleMerchantMoneyByOutOrder", "二个执行更新SQL其中有一个或者多个响应行为0");
 //                throw new RuntimeException();
+        }
+    }
+
+
+
+
+    /**
+     * @Description: check校验被筛选的代付的使用状态
+     * @param replacePayModel - 代付信息
+     * @param orderOutModel - 订单信息
+     * @return BankModel
+     * @author yoko
+     * @date 2020/9/12 21:02
+     */
+    public ReplacePayModel getReplacePayData(ReplacePayModel replacePayModel, OrderOutModel orderOutModel) throws Exception{
+        // 判断此代付是否被锁住
+        String lockKey_replacePay = CachedKeyUtils.getCacheKey(CacheKey.LOCK_REPLACE_PAY, replacePayModel.getId());
+        boolean flagLock_replacePay = ComponentUtil.redisIdService.lock(lockKey_replacePay);
+        if (flagLock_replacePay){
+            // 校验代付是否受到付款限制
+            boolean flag = checkReplacePayLimit(replacePayModel);
+            if (flag){
+                if (!StringUtils.isBlank(replacePayModel.getOpenTimeSlot())){
+                    // 校验代付的放量时间
+                    boolean flag_openTime = HodgepodgeMethod.checkOpenTimeSlot(replacePayModel.getOpenTimeSlot());
+                    if (flag_openTime){
+                        // 请求衫德代付
+                        AgentPayResponse sandResponse = AgentPay.sandAgentPay(replacePayModel, orderOutModel);
+                        if (sandResponse != null && sandResponse.respCode.equals("0")){
+                            // 解锁
+                            ComponentUtil.redisIdService.delLock(lockKey_replacePay);
+                            return replacePayModel;
+                        }
+                    }
+                }
+
+            }
+            // 解锁
+            ComponentUtil.redisIdService.delLock(lockKey_replacePay);
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+    /**
+     * @Description: check校验代付限量
+     * @param replacePayModel - 代付信息
+     * @return
+     * @author yoko
+     * @date 2020/9/12 21:19
+     */
+    public boolean checkReplacePayLimit(ReplacePayModel replacePayModel){
+        boolean flag = true;
+        String dayMoney = getRedisDataByKey(CacheKey.OUT_DAY_MONEY, replacePayModel.getId());
+        if (!StringUtils.isBlank(dayMoney)){
+            return false;
+        }
+        String monthMoney = getRedisDataByKey(CacheKey.OUT_MONTH_MONEY, replacePayModel.getId());
+        if (!StringUtils.isBlank(monthMoney)){
+            return false;
+        }
+        String dayNum = getRedisDataByKey(CacheKey.OUT_DAY_NUM, replacePayModel.getId());
+        if (!StringUtils.isBlank(dayNum)){
+            return false;
+        }
+        return flag;
+    }
+
+
+    /**
+     * @Description: 组装缓存key查询缓存中存在的数据
+     * @param cacheKey - 缓存的类型key
+     * @param obj - 数据的ID
+     * @return
+     * @author yoko
+     * @date 2020/5/20 14:59
+     */
+    public String getRedisDataByKey(String cacheKey, Object obj){
+        String str = null;
+        String strKeyCache = CachedKeyUtils.getCacheKey(cacheKey, obj);
+        String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
+        if (StringUtils.isBlank(strCache)){
+            return str;
+        }else{
+            str = strCache;
+            return str;
         }
     }
 

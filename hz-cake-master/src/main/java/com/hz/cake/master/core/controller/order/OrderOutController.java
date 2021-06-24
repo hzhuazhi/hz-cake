@@ -13,6 +13,8 @@ import com.hz.cake.master.core.model.merchant.MerchantModel;
 import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.region.RegionModel;
+import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
+import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
 import com.hz.cake.master.core.model.strategy.StrategyModel;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
 import com.hz.cake.master.util.ComponentUtil;
@@ -31,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.hz.cake.master.util.ComponentUtil.replacePayService;
 
 /**
  * @Description 代付订单的Controller层
@@ -262,6 +266,11 @@ public class OrderOutController {
             HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
 
 
+            // 策略数据：代付出码规则
+            int replacePayRule = 0; // 代付出码规则:1从ID从小到大，2金额从小到大
+            StrategyModel strategyReplacePayRuleQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_RULE.getStgType());
+            StrategyModel strategyReplacePayRuleModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayRuleQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayRule = strategyReplacePayRuleModel.getStgNumValue();
 
 
 
@@ -288,36 +297,56 @@ public class OrderOutController {
             List<MerchantModel> merchantList = ComponentUtil.merchantService.findByCondition(merchantModel);
             HodgepodgeMethod.checkMerchantIsNullByOutOrder(merchantList);
 
-//            代付
 
-            // 获取根据渠道/商户绑定，获取上次最大的卡商ID
-            long maxMerchantId = 0;
+            // 获取上次最大的代付ID
+            long maxReplacePayId = 0;
 
-            // 获取上次给出的银行卡ID
-            maxMerchantId = HodgepodgeMethod.getMaxMerchantByRedis(0, channelModel.getId());
+            // 获取上次给出的代付ID
+            maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
 
+            // 查询代付集合数据
+            ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money);
+            List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
+            HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
 
-            // 卡商集合按照上次给出过码进行排序
-            List<MerchantModel> sortList = HodgepodgeMethod.sortMerchantList(merchantList, maxMerchantId);
+            // 代付集合进行排序
+            List<ReplacePayModel> sortList = null;
+            if (replacePayRule == 1){
+                // 1从ID从小到大，
+                sortList = HodgepodgeMethod.sortReplacePayList(replacePayList, maxReplacePayId);
+            }else if (replacePayRule == 2){
+                // 2金额从小到大
+                sortList = replacePayList;
+                sortList.sort((x, y) -> Double.compare(Double.parseDouble(x.getDayMoney()), Double.parseDouble(y.getDayMoney())));
+            }
 
+            // 组装请求衫德的订单信息
+            OrderOutModel orderOutSand = HodgepodgeMethod.assembleOrderOutSand(requestModel, sgid);
 
-            // 筛选可用的卡商
-            MerchantModel merchantData = ComponentUtil.orderOutService.screenMerchantByMoney(sortList, requestModel.money, sgid);
-            HodgepodgeMethod.checkScreenMerchantsNull(merchantData);
+            // 筛选可用的代付
+            ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(replacePayList, merchantList, orderOutSand);
+            HodgepodgeMethod.checkScreenReplacePayNull(replacePayData);
 
             String serviceCharge = "";// 卡商手续费
             // 获取卡商绑定渠道的手续费
-            MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, merchantData.getId(), channelModel.getId(),1);
+            MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, replacePayData.getMerchantId(), channelModel.getId(),1);
             MerchantServiceChargeModel merchantServiceChargeModel = (MerchantServiceChargeModel)ComponentUtil.merchantServiceChargeService.findByObject(merchantServiceChargeQuery);
             serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
 
             // 添加代付订单
-            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutAdd(merchantData, requestModel, channelModel, sgid, serviceCharge);
+            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutBySandAdd(orderOutSand, replacePayData, merchantList, channelModel, serviceCharge);
             int num = ComponentUtil.orderOutService.add(orderOutModel);
             HodgepodgeMethod.checkAddOrderOutIsOk(num);
 
-            // 存储redis：给出的卡商ID，用于字段maxMerchantId
-            HodgepodgeMethod.saveMaxMerchantByRedis(0, channelModel.getId(), merchantData.getId());
+            // 添加主动拉取订单结果的数据
+            if (replacePayData.getGainDataType() == 2){
+                // 获取订单结果类型：1被动接收数据，2主动查询
+                ReplacePayGainModel replacePayGainModel = HodgepodgeMethod.assembleReplacePayGainAdd(orderOutModel, replacePayData);
+                ComponentUtil.replacePayGainService.add(replacePayGainModel);
+            }
+
+            // 存储redis：给出的代付ID，用于字段maxReplacePayId
+            HodgepodgeMethod.saveMaxreplacePayByRedis( replacePayData.getId());
 
             // 组装返回客户端的数据
             long stime = System.currentTimeMillis();
@@ -330,9 +359,9 @@ public class OrderOutController {
             return JsonResult.successResult(resultDataModel, cgid, sgid);
         }catch (Exception e){
             Map<String,String> map = ExceptionMethod.getException(e, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
-            log.error(String.format("this OrderOutController.qrCode() is error , the cgid=%s and sgid=%s and all data=%s!", cgid, sgid, data));
+            log.error(String.format("this OrderOutController.sandQrCode() is error , the cgid=%s and sgid=%s and all data=%s!", cgid, sgid, data));
             if (!StringUtils.isBlank(map.get("dbCode"))){
-                log.error(String.format("this OrderOutController.qrCode() is error codeInfo, the dbCode=%s and dbMessage=%s !", map.get("dbCode"), map.get("dbMessage")));
+                log.error(String.format("this OrderOutController.sandQrCode() is error codeInfo, the dbCode=%s and dbMessage=%s !", map.get("dbCode"), map.get("dbMessage")));
             }
             e.printStackTrace();
             return JsonResult.failedResult(map.get("message"), map.get("code"), cgid, sgid);

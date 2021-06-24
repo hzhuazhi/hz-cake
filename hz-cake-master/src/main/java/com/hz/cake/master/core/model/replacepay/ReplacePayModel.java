@@ -3,6 +3,8 @@ package com.hz.cake.master.core.model.replacepay;
 import com.hz.cake.master.core.protocol.page.BasePage;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Description 代付资源的实体属性Bean
@@ -175,7 +177,7 @@ public class ReplacePayModel extends BasePage implements Serializable {
     /**
      * 主动获取订单结果的间隔时间类型：1任意时间都可查询，2固定时间，3集合某时间间隔（5分钟，8分钟....）
      */
-    private String gainDataTimeType;
+    private Integer gainDataTimeType;
 
     /**
      * 主动获取订单结果的具体间隔时间（单位秒）：当gain_data_time_type=1时这里无需填值，等于2时这里可以填任意正整数，等于3时这里填（300#800#...多个以#隔开）
@@ -216,6 +218,63 @@ public class ReplacePayModel extends BasePage implements Serializable {
      * 是否有效：0有效，1无效/删除
      */
     private Integer yn;
+
+    /**
+     * 代付策略的主键ID
+     */
+    private Long replacePayStrategyId;
+
+    /**
+     * 归属代付资源ID：对应表tb_fr_replace_pay的主键ID
+     */
+    private Long replacePayId;
+
+
+    /**
+     * 优先级：就是填入数字，数字越小的优先级越靠前
+     */
+    private Integer priority;
+
+    /**
+     * 放量时间段：支持多个时间段，以#号分割
+     */
+    private String openTimeSlot;
+
+    /**
+     *日付款限量金额
+     */
+    private String outDayMoney;
+
+    /**
+     * 月付款限量金额
+     */
+    private String outMonthMoney;
+
+    /**
+     * 日付款限量次数
+     */
+    private Integer outDayNum;
+
+    /**
+     * 每日已经代付的成功金额
+     */
+    private String dayMoney;
+
+    /**
+     * 日期
+     */
+    private Integer curday;
+
+
+    /**
+     * 金额
+     */
+    private BigDecimal money;
+
+    /**
+     * 卡商集合
+     */
+    private List<Long> merchantIdList;
 
 
     public Long getId() {
@@ -450,11 +509,11 @@ public class ReplacePayModel extends BasePage implements Serializable {
         this.gainDataType = gainDataType;
     }
 
-    public String getGainDataTimeType() {
+    public Integer getGainDataTimeType() {
         return gainDataTimeType;
     }
 
-    public void setGainDataTimeType(String gainDataTimeType) {
+    public void setGainDataTimeType(Integer gainDataTimeType) {
         this.gainDataTimeType = gainDataTimeType;
     }
 
@@ -528,5 +587,94 @@ public class ReplacePayModel extends BasePage implements Serializable {
 
     public void setAccountType(String accountType) {
         this.accountType = accountType;
+    }
+
+
+    public Long getReplacePayStrategyId() {
+        return replacePayStrategyId;
+    }
+
+    public void setReplacePayStrategyId(Long replacePayStrategyId) {
+        this.replacePayStrategyId = replacePayStrategyId;
+    }
+
+    public Long getReplacePayId() {
+        return replacePayId;
+    }
+
+    public void setReplacePayId(Long replacePayId) {
+        this.replacePayId = replacePayId;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public String getOpenTimeSlot() {
+        return openTimeSlot;
+    }
+
+    public void setOpenTimeSlot(String openTimeSlot) {
+        this.openTimeSlot = openTimeSlot;
+    }
+
+    public String getOutDayMoney() {
+        return outDayMoney;
+    }
+
+    public void setOutDayMoney(String outDayMoney) {
+        this.outDayMoney = outDayMoney;
+    }
+
+    public String getOutMonthMoney() {
+        return outMonthMoney;
+    }
+
+    public void setOutMonthMoney(String outMonthMoney) {
+        this.outMonthMoney = outMonthMoney;
+    }
+
+    public Integer getOutDayNum() {
+        return outDayNum;
+    }
+
+    public void setOutDayNum(Integer outDayNum) {
+        this.outDayNum = outDayNum;
+    }
+
+    public String getDayMoney() {
+        return dayMoney;
+    }
+
+    public void setDayMoney(String dayMoney) {
+        this.dayMoney = dayMoney;
+    }
+
+    public Integer getCurday() {
+        return curday;
+    }
+
+    public void setCurday(Integer curday) {
+        this.curday = curday;
+    }
+
+    public BigDecimal getMoney() {
+        return money;
+    }
+
+    public void setMoney(BigDecimal money) {
+        this.money = money;
+    }
+
+    public List<Long> getMerchantIdList() {
+        return merchantIdList;
+    }
+
+    public void setMerchantIdList(List<Long> merchantIdList) {
+        this.merchantIdList = merchantIdList;
     }
 }
