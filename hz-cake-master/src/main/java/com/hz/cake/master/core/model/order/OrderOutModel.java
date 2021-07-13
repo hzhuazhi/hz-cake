@@ -194,6 +194,11 @@ public class OrderOutModel extends BasePage implements Serializable {
     private Integer operateStatus;
 
     /**
+     * 是否被导出过:1初始化未被导出，2已被导出过
+     */
+    private Integer isExcel;
+
+    /**
      * 补充数据的类型：1初始化，2补充数据失败（其它原因等..），3补充数据成功
      */
     private Integer workType;
@@ -727,5 +732,13 @@ public class OrderOutModel extends BasePage implements Serializable {
 
     public void setReplacePayName(String replacePayName) {
         this.replacePayName = replacePayName;
+    }
+
+    public Integer getIsExcel() {
+        return isExcel;
+    }
+
+    public void setIsExcel(Integer isExcel) {
+        this.isExcel = isExcel;
     }
 }

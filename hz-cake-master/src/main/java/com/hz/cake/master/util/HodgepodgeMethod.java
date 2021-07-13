@@ -1757,11 +1757,12 @@ public class HodgepodgeMethod {
      * @param channelModel - 商户信息
      * @param orderNo - 订单号
      * @param serviceCharge - 卡商手续费
+     * @param replacePayInvalidTimeNum - 代付订单的失效时间
      * @return OrderModel
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderOutModel assembleOrderOutAdd(MerchantModel merchantModel, ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo, String serviceCharge){
+    public static OrderOutModel assembleOrderOutAdd(MerchantModel merchantModel, ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo, String serviceCharge, int replacePayInvalidTimeNum){
         OrderOutModel resBean = new OrderOutModel();
         resBean.setOrderNo(orderNo);
         resBean.setOrderMoney(requestModel.money);
@@ -1770,6 +1771,9 @@ public class HodgepodgeMethod {
         if (!StringUtils.isBlank(serviceCharge)){
             resBean.setServiceCharge(serviceCharge);
         }
+        // 订单失效时间
+        String invalidTime = DateUtil.addDateMinute(replacePayInvalidTimeNum);
+        resBean.setInvalidTime(invalidTime);
         resBean.setInBankCard(requestModel.inBankCard);
         resBean.setInBankName(requestModel.inBankName);
         resBean.setInAccountName(requestModel.inAccountName);

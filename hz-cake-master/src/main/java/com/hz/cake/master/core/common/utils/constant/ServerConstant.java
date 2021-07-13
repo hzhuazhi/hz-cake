@@ -114,6 +114,7 @@ public class ServerConstant {
         IS_TRANSFER_USER(27,""),
         TRANSFER_USER_RULE(28,""),
         REPLACE_PAY_RULE(29,""),
+        REPLACE_PAY_INVALID_TIME_NUM(30,""),
 
 
 

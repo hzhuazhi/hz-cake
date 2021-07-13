@@ -129,6 +129,12 @@ public class OrderOutController {
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
 
+            // 策略数据：代付订单超时时间
+            int replacePayInvalidTimeNum = 0;
+            StrategyModel strategyReplacePayInvalidTimeNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_INVALID_TIME_NUM.getStgType());
+            StrategyModel strategyReplacePayInvalidTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayInvalidTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayInvalidTimeNum = strategyReplacePayInvalidTimeNumModel.getStgNumValue();
+
 
             // 根据秘钥获取商户信息
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
@@ -174,7 +180,7 @@ public class OrderOutController {
             serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
 
             // 添加代付订单
-            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutAdd(merchantData, requestModel, channelModel, sgid, serviceCharge);
+            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutAdd(merchantData, requestModel, channelModel, sgid, serviceCharge, replacePayInvalidTimeNum);
             int num = ComponentUtil.orderOutService.add(orderOutModel);
             HodgepodgeMethod.checkAddOrderOutIsOk(num);
 
