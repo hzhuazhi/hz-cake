@@ -2233,7 +2233,7 @@ public class HodgepodgeMethod {
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderOutModel assembleOrderOutSand(ProtocolOrderOut requestModel, String orderNo){
+    public static OrderOutModel assembleOrderOutSand(ProtocolOrderOut requestModel, String orderNo) throws Exception{
         OrderOutModel resBean = new OrderOutModel();
         resBean.setOrderNo(orderNo);
         resBean.setOrderMoney(requestModel.money);
@@ -2255,7 +2255,7 @@ public class HodgepodgeMethod {
             resBean.setNotifyUrl(requestModel.notifyUrl);
         }
 
-        resBean.setTradeTime(String.valueOf(System.currentTimeMillis()));
+        resBean.setTradeTime(String.valueOf(DateUtil.getNowLongTime()));
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
@@ -2361,6 +2361,44 @@ public class HodgepodgeMethod {
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
+    }
+
+
+    /**
+     * @Description: 换算杉德代付拉单的订单金额
+     * <p>
+     *     不足12位则订单金额前面补0
+     * </p>
+     * @param orderMoney - 代付拉单订单金额
+     * @return
+     * @Author: yoko
+     * @Date 2021/10/13 16:02
+    */
+    public static String sandPayOrderMoney(String orderMoney){
+        String str = "";
+        BigDecimal  amt  = new BigDecimal (orderMoney);
+        Double tmp = amt.multiply(new BigDecimal(100)).doubleValue();
+        str = String.format("%012d", Math.abs(tmp.intValue()));
+        return str;
+    }
+
+
+    /**
+     * @Description: 换算杉德余额
+     * <p>
+     *     杉德余额属于12位，需要把余额变更成正常金额
+     * </p>
+     * @param balance - 余额
+     * @return
+     * @Author: yoko
+     * @Date 2021/10/13 16:02
+     */
+    public static String sandPayBalance(String balance){
+        String str = "";
+        BigDecimal  amt  = new BigDecimal (balance);
+        Double tmp = amt.divide(new BigDecimal(100)).doubleValue();
+        str = tmp.toString();
+        return str;
     }
 
 
@@ -2513,6 +2551,12 @@ public class HodgepodgeMethod {
         }
 
 
+
+        String orderMoney = sandPayOrderMoney("12373.00");
+        System.out.println("orderMoney:" + orderMoney);
+
+        String balance = sandPayBalance("0001012373990");
+        System.out.println("balance:" + balance);
 
     }
 

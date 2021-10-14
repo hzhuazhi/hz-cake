@@ -1,5 +1,6 @@
 package com.hz.cake.master.core.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.hz.cake.master.core.common.dao.BaseDao;
 import com.hz.cake.master.core.common.exception.ServiceException;
 import com.hz.cake.master.core.common.service.impl.BaseServiceImpl;
@@ -21,6 +22,8 @@ import com.hz.cake.master.util.ComponentUtil;
 import com.hz.cake.master.util.HodgepodgeMethod;
 import com.hz.cake.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class OrderOutServiceImpl<T> extends BaseServiceImpl<T> implements OrderOutService<T> {
+    private static Logger log = LoggerFactory.getLogger(OrderOutServiceImpl.class);
+
     /**
      * 5分钟.
      */
@@ -199,7 +204,13 @@ public class OrderOutServiceImpl<T> extends BaseServiceImpl<T> implements OrderO
                     if (flag_openTime){
                         // 请求衫德代付
                         AgentPayResponse sandResponse = AgentPay.sandAgentPay(replacePayModel, orderOutModel);
-                        if (sandResponse != null && sandResponse.respCode.equals("0")){
+                        if (sandResponse != null && sandResponse.respCode.equals("0000")){
+                            log.info("OrderOutServiceImpl.getReplacePayData().sandResponse:" + JSON.toJSONString(sandResponse));
+
+//                            // 金额还原
+//                            if (orderOutModel.getOrderMoney().length()==12){
+//                                orderOutModel.setOrderMoney(HodgepodgeMethod.sandPayBalance(orderOutModel.getOrderMoney()));
+//                            }
                             // 解锁
                             ComponentUtil.redisIdService.delLock(lockKey_replacePay);
                             return replacePayModel;

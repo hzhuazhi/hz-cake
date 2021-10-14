@@ -21,6 +21,7 @@ import com.hz.cake.master.core.common.utils.sandpay.SDKConfig;
 import com.hz.cake.master.core.common.utils.sandpay.model.AgentPayResponse;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
+import com.hz.cake.master.util.HodgepodgeMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +54,8 @@ public class AgentPay {
 		request.put("currencyCode", DemoBase.CURRENCY_CODE);                    //币种       
 		request.put("accAttr", "0");                                            //账户属性     0-对私   1-对公
 		request.put("accType", "4");                                            //账号类型      3-公司账户  4-银行卡
-		request.put("accNo", "6228480038125000000");                            //收款人账户号   
-		request.put("accName", "施祺");                                       		//收款人账户名   
+		request.put("accNo", "6217002430068770263");                            //收款人账户号
+		request.put("accName", "杨坤");                                       		//收款人账户名
 		request.put("provNo", "");                                              //收款人开户省份编码
 		request.put("cityNo", "");                                              //收款人开会城市编码
 		request.put("bankName", "");                                            //收款账户开户行名称
@@ -77,10 +78,11 @@ public class AgentPay {
 
 		request.put("version", DemoBase.version);								//版本号
 		request.put("productId", DemoBase.PRODUCTID_AGENTPAY_TOC);              //产品ID
-		request.put("tranTime", orderOutModel.getTradeTime());                     //交易时间
+//		request.put("tranTime", DemoBase.getCurrentTime());
+		request.put("tranTime", orderOutModel.getTradeTime());//交易时间
 		request.put("orderCode", orderOutModel.getOrderNo());                      //订单号
-		request.put("timeOut", "30");                      //订单超时时间
-		request.put("tranAmt", orderOutModel.getOrderMoney());                                 //金额
+		request.put("timeOut", "120");                      //订单超时时间
+		request.put("tranAmt", HodgepodgeMethod.sandPayOrderMoney(orderOutModel.getOrderMoney()));                                 //金额
 		request.put("currencyCode", DemoBase.CURRENCY_CODE);                    //币种
 		request.put("accAttr", replacePayModel.getAccountAttribute());                                            //账户属性     0-对私   1-对公
 		request.put("accType", replacePayModel.getAccountType());                                            //账号类型      3-公司账户  4-银行卡
@@ -117,6 +119,9 @@ public class AgentPay {
 		//加载证书
 		CertUtil.init(replacePayModel.getPublicKeyPath(), replacePayModel.getPrivateKeyPath(), replacePayModel.getSandKey());
 		//设置报文
+//		// 金额换算
+//		String orderMoney = HodgepodgeMethod.sandPayOrderMoney(orderOutModel.getOrderMoney());
+//		orderOutModel.setOrderMoney(orderMoney);
 		demo.setRequest(replacePayModel, orderOutModel);
 
 		String merId = replacePayModel.getBusinessNum(); 			//商户ID
@@ -128,7 +133,8 @@ public class AgentPay {
 			logger.info("响应码：["+resp.getString("respCode")+"]");
 			logger.info("响应描述：["+resp.getString("respDesc")+"]");
 			logger.info("处理状态：["+resp.getString("resultFlag")+"]");
-			AgentPayResponse result = BeanUtils.copy(resp, AgentPayResponse.class);
+//			AgentPayResponse result = BeanUtils.copy(resp, AgentPayResponse.class);
+			AgentPayResponse result = JSON.parseObject(resp.toJSONString(), AgentPayResponse.class);
 			return result;
 		}else {
 			logger.error("服务器请求异常！！！");
@@ -147,12 +153,19 @@ public class AgentPay {
 		//加载配置文件
 		SDKConfig.getConfig().loadPropertiesFromSrc();
 		//加载证书
-		CertUtil.init(SDKConfig.getConfig().getSandCertPath(), SDKConfig.getConfig().getSignCertPath(), SDKConfig.getConfig().getSignCertPwd());
+		String sandCertPath = "D:\\sandpay\\sand.cer";
+		String signCertPath = "D:\\sandpay\\6888805039337.pfx";
+		String signCertPwd = "183137";
+//		CertUtil.init(SDKConfig.getConfig().getSandCertPath(), SDKConfig.getConfig().getSignCertPath(), SDKConfig.getConfig().getSignCertPwd());
+		CertUtil.init(sandCertPath, signCertPath, signCertPwd);
 		//设置报文
 		demo.setRequest();
-		
-		String merId = SDKConfig.getConfig().getMid(); 			//商户ID
-		String plMid = SDKConfig.getConfig().getPlMid();		//平台商户ID
+
+		String mid = "6888805039337";
+//		String merId = SDKConfig.getConfig().getMid(); 			//商户ID
+		String merId = mid; 			//商户ID
+//		String plMid = SDKConfig.getConfig().getPlMid();		//平台商户ID
+		String plMid = "";		//平台商户ID
 
 		JSONObject resp = DemoBase.requestServer(demo.request, reqAddr, DemoBase.AGENT_PAY, merId, plMid);
 

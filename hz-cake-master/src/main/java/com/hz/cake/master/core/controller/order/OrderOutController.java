@@ -330,7 +330,7 @@ public class OrderOutController {
             OrderOutModel orderOutSand = HodgepodgeMethod.assembleOrderOutSand(requestModel, sgid);
 
             // 筛选可用的代付
-            ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(replacePayList, merchantList, orderOutSand);
+            ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(sortList, merchantList, orderOutSand);
             HodgepodgeMethod.checkScreenReplacePayNull(replacePayData);
 
             String serviceCharge = "";// 卡商手续费
