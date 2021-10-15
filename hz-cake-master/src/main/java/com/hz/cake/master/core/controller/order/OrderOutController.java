@@ -239,7 +239,7 @@ public class OrderOutController {
      */
     @RequestMapping(value = "/sandQrCode", method = {RequestMethod.POST})
     public JsonResult<Object> sandQrCode(HttpServletRequest request, HttpServletResponse response, @RequestBody RequestEncryptionJson requestData) throws Exception{
-        String sgid = "ZDF" + ComponentUtil.redisIdService.getNewId();
+        String sgid = "CDFA" + ComponentUtil.redisIdService.getNewId();
         String cgid = "";
         String token = "";
         String ip = StringUtil.getIpAddress(request);
