@@ -5,7 +5,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.alias,a.secret_key,a.bank_binding_type,a.channel_type,a.in_money_range,a.out_money_range,a.money_lock_time,a.invalid_time_num,
+        a.id,a.alias,a.secret_key,a.bank_binding_type,a.channel_type,a.in_money_range,a.out_money_range,a.money_lock_time,a.invalid_time_num,a.replace_pay_type,
         a.remark,a.use_status,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -136,6 +136,9 @@
             <if test="invalidTimeNum != null and invalidTimeNum != '' " >
                 invalid_time_num,
             </if>
+            <if test="replacePayType != null and replacePayType != '' " >
+                replace_pay_type,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
@@ -169,6 +172,9 @@
             </if>
             <if test="invalidTimeNum != null and invalidTimeNum != '' " >
                 <![CDATA[  #{invalidTimeNum}, ]]>
+            </if>
+            <if test="replacePayType != null and replacePayType != '' " >
+                <![CDATA[  #{replacePayType}, ]]>
             </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>
@@ -207,6 +213,9 @@
             </if>
             <if test="invalidTimeNum != null and invalidTimeNum != '' " >
                 a.invalid_time_num = #{invalidTimeNum},
+            </if>
+            <if test="replacePayType != null and replacePayType != '' " >
+                a.replace_pay_type = #{replacePayType},
             </if>
             <if test="remark != null and remark != '' " >
                 a.remark = #{remark},

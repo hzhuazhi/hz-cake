@@ -143,6 +143,12 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private ReplacePayGainResultService replacePayGainResultService;
 
+    @Autowired
+    private OrderOutPrepareService orderOutPrepareService;
+
+    @Autowired
+    private OrderOutLimitService orderOutLimitService;
+
 
 
 
@@ -193,6 +199,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.replacePayInfoService = replacePayInfoService;
         ComponentUtil.replacePayGainService = replacePayGainService;
         ComponentUtil.replacePayGainResultService = replacePayGainResultService;
+        ComponentUtil.orderOutPrepareService = orderOutPrepareService;
+        ComponentUtil.orderOutLimitService = orderOutLimitService;
 
         runThread = new RunThread();
         runThread.start();

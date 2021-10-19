@@ -50,6 +50,8 @@ public class ComponentUtil {
     public static ReplacePayInfoService replacePayInfoService;
     public static ReplacePayGainService replacePayGainService;
     public static ReplacePayGainResultService replacePayGainResultService;
+    public static OrderOutPrepareService orderOutPrepareService;
+    public static OrderOutLimitService orderOutLimitService;
 
 
 }

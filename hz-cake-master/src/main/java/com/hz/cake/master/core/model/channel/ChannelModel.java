@@ -58,6 +58,11 @@ public class ChannelModel extends BasePage implements Serializable {
      */
     private Integer invalidTimeNum;
 
+    /**
+     * 代付方式：0初始化，1手动转账，2API转账
+     */
+    private Integer replacePayType;
+
 
     /**
      * 备注
@@ -194,5 +199,13 @@ public class ChannelModel extends BasePage implements Serializable {
 
     public void setChannelType(Integer channelType) {
         this.channelType = channelType;
+    }
+
+    public Integer getReplacePayType() {
+        return replacePayType;
+    }
+
+    public void setReplacePayType(Integer replacePayType) {
+        this.replacePayType = replacePayType;
     }
 }
