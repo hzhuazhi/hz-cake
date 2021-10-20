@@ -115,6 +115,9 @@ public class ServerConstant {
         TRANSFER_USER_RULE(28,""),
         REPLACE_PAY_RULE(29,""),
         REPLACE_PAY_INVALID_TIME_NUM(30,""),
+        EXCEL_NUM(31,""),
+        EXCEL_MONEY(32,""),
+        REPLACE_PAY_TYPE(33,""),
 
 
 

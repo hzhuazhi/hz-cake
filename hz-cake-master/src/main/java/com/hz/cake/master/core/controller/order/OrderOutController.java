@@ -12,6 +12,7 @@ import com.hz.cake.master.core.model.merchant.MerchantChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantModel;
 import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
+import com.hz.cake.master.core.model.order.OrderOutPrepareModel;
 import com.hz.cake.master.core.model.region.RegionModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
@@ -279,6 +280,12 @@ public class OrderOutController {
             replacePayRule = strategyReplacePayRuleModel.getStgNumValue();
 
 
+            // 策略数据：代付方式
+            int replacePayType = 0; // 代付方式：1直接转账，2预备转账（预备是走TASK）
+            StrategyModel strategyReplacePayTypeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_TYPE.getStgType());
+            StrategyModel strategyReplacePayTypeModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayTypeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayType = strategyReplacePayTypeModel.getStgNumValue();
+
 
 
             // 根据秘钥获取商户信息
@@ -286,83 +293,101 @@ public class OrderOutController {
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderChannelIsNull(channelModel);
 
-            // 根据渠道获取关联的卡商
-            MerchantChannelModel merchantChannelQuery = HodgepodgeMethod.assembleMerchantChannelQuery(0,0,0, channelModel.getId(), 1);
-            List<MerchantChannelModel> merchantChannelList = ComponentUtil.merchantChannelService.findByCondition(merchantChannelQuery);
-            HodgepodgeMethod.checkMerchantChannelIsNull(merchantChannelList);
 
-            // 获取卡商的集合ID
-            List<Long> merchantIdList = null;
-            if (merchantChannelList != null && merchantChannelList.size() > 0){
-                merchantIdList = merchantChannelList.stream().map(MerchantChannelModel::getMerchantId).collect(Collectors.toList());
+            if (channelModel.getReplacePayType() != null && channelModel.getReplacePayType() != 0){
+                replacePayType = channelModel.getReplacePayType();
             }
 
 
-            // 根据渠道与卡商的关联关系中的卡商ID获取卡商集合
-            MerchantModel merchantModel = HodgepodgeMethod.assembleMerchantQuery(0, 0, 2, merchantIdList, requestModel.money, 1);
-            List<MerchantModel> merchantList = ComponentUtil.merchantService.findByCondition(merchantModel);
-            HodgepodgeMethod.checkMerchantIsNullByOutOrder(merchantList);
+            if (replacePayType == 1){
+                // 直接转账
+                // 根据渠道获取关联的卡商
+                MerchantChannelModel merchantChannelQuery = HodgepodgeMethod.assembleMerchantChannelQuery(0,0,0, channelModel.getId(), 1);
+                List<MerchantChannelModel> merchantChannelList = ComponentUtil.merchantChannelService.findByCondition(merchantChannelQuery);
+                HodgepodgeMethod.checkMerchantChannelIsNull(merchantChannelList);
+
+                // 获取卡商的集合ID
+                List<Long> merchantIdList = null;
+                if (merchantChannelList != null && merchantChannelList.size() > 0){
+                    merchantIdList = merchantChannelList.stream().map(MerchantChannelModel::getMerchantId).collect(Collectors.toList());
+                }
 
 
-            // 获取上次最大的代付ID
-            long maxReplacePayId = 0;
+                // 根据渠道与卡商的关联关系中的卡商ID获取卡商集合
+                MerchantModel merchantModel = HodgepodgeMethod.assembleMerchantQuery(0, 0, 2, merchantIdList, requestModel.money, 1);
+                List<MerchantModel> merchantList = ComponentUtil.merchantService.findByCondition(merchantModel);
+                HodgepodgeMethod.checkMerchantIsNullByOutOrder(merchantList);
 
-            // 获取上次给出的代付ID
-            maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
 
-            // 查询代付集合数据
-            ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money);
-            List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
-            HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
+                // 获取上次最大的代付ID
+                long maxReplacePayId = 0;
 
-            // 代付集合进行排序
-            List<ReplacePayModel> sortList = null;
-            if (replacePayRule == 1){
-                // 1从ID从小到大，
-                sortList = HodgepodgeMethod.sortReplacePayList(replacePayList, maxReplacePayId);
-            }else if (replacePayRule == 2){
-                // 2金额从小到大
-                sortList = replacePayList;
-                sortList.sort((x, y) -> Double.compare(Double.parseDouble(x.getDayMoney()), Double.parseDouble(y.getDayMoney())));
+                // 获取上次给出的代付ID
+                maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
+
+                // 查询代付集合数据
+                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money);
+                List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
+                HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
+
+                // 代付集合进行排序
+                List<ReplacePayModel> sortList = null;
+                if (replacePayRule == 1){
+                    // 1从ID从小到大，
+                    sortList = HodgepodgeMethod.sortReplacePayList(replacePayList, maxReplacePayId);
+                }else if (replacePayRule == 2){
+                    // 2金额从小到大
+                    sortList = replacePayList;
+                    sortList.sort((x, y) -> Double.compare(Double.parseDouble(x.getDayMoney()), Double.parseDouble(y.getDayMoney())));
+                }
+
+                // 组装请求衫德的订单信息
+                OrderOutModel orderOutSand = HodgepodgeMethod.assembleOrderOutSand(requestModel, sgid);
+
+                // 筛选可用的代付
+                ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(sortList, merchantList, orderOutSand);
+                HodgepodgeMethod.checkScreenReplacePayNull(replacePayData);
+
+                String serviceCharge = "";// 卡商手续费
+                // 获取卡商绑定渠道的手续费
+                MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, replacePayData.getMerchantId(), channelModel.getId(),1);
+                MerchantServiceChargeModel merchantServiceChargeModel = (MerchantServiceChargeModel)ComponentUtil.merchantServiceChargeService.findByObject(merchantServiceChargeQuery);
+                serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
+
+                // 添加代付订单
+                OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutBySandAdd(orderOutSand, replacePayData, merchantList, channelModel, serviceCharge);
+                int num = ComponentUtil.orderOutService.add(orderOutModel);
+                HodgepodgeMethod.checkAddOrderOutIsOk(num);
+
+                // 添加主动拉取订单结果的数据
+                if (replacePayData.getGainDataType() == 2){
+                    // 获取订单结果类型：1被动接收数据，2主动查询
+                    ReplacePayGainModel replacePayGainModel = HodgepodgeMethod.assembleReplacePayGainAdd(orderOutModel, replacePayData);
+                    ComponentUtil.replacePayGainService.add(replacePayGainModel);
+                }
+
+                // 存储redis：给出的代付ID，用于字段maxReplacePayId
+                HodgepodgeMethod.saveMaxreplacePayByRedis( replacePayData.getId());
+
+                // 组装返回客户端的数据
+                long stime = System.currentTimeMillis();
+                String strData = HodgepodgeMethod.assembleOrderOutDataResult(stime, token, orderOutModel, requestModel.returnUrl);
+                // 数据加密
+                String encryptionData = StringUtil.mergeCodeBase64(strData);
+                ResponseEncryptionJson resultDataModel = new ResponseEncryptionJson();
+                resultDataModel.jsonData = encryptionData;
+                // 返回数据给客户端
+                return JsonResult.successResult(resultDataModel, cgid, sgid);
+            }else{
+                // 预备转账：需要先把订单数据存储到预付订单里面
+                OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid);
+                int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
+                if (num > 0){
+                    return JsonResult.successResult(null, cgid, sgid);
+                }else {
+                    return JsonResult.failedResult(cgid, sgid);
+                }
             }
-
-            // 组装请求衫德的订单信息
-            OrderOutModel orderOutSand = HodgepodgeMethod.assembleOrderOutSand(requestModel, sgid);
-
-            // 筛选可用的代付
-            ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(sortList, merchantList, orderOutSand);
-            HodgepodgeMethod.checkScreenReplacePayNull(replacePayData);
-
-            String serviceCharge = "";// 卡商手续费
-            // 获取卡商绑定渠道的手续费
-            MerchantServiceChargeModel merchantServiceChargeQuery = HodgepodgeMethod.assembleMerchantServiceChargeQuery(0, replacePayData.getMerchantId(), channelModel.getId(),1);
-            MerchantServiceChargeModel merchantServiceChargeModel = (MerchantServiceChargeModel)ComponentUtil.merchantServiceChargeService.findByObject(merchantServiceChargeQuery);
-            serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
-
-            // 添加代付订单
-            OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutBySandAdd(orderOutSand, replacePayData, merchantList, channelModel, serviceCharge);
-            int num = ComponentUtil.orderOutService.add(orderOutModel);
-            HodgepodgeMethod.checkAddOrderOutIsOk(num);
-
-            // 添加主动拉取订单结果的数据
-            if (replacePayData.getGainDataType() == 2){
-                // 获取订单结果类型：1被动接收数据，2主动查询
-                ReplacePayGainModel replacePayGainModel = HodgepodgeMethod.assembleReplacePayGainAdd(orderOutModel, replacePayData);
-                ComponentUtil.replacePayGainService.add(replacePayGainModel);
-            }
-
-            // 存储redis：给出的代付ID，用于字段maxReplacePayId
-            HodgepodgeMethod.saveMaxreplacePayByRedis( replacePayData.getId());
-
-            // 组装返回客户端的数据
-            long stime = System.currentTimeMillis();
-            String strData = HodgepodgeMethod.assembleOrderOutDataResult(stime, token, orderOutModel, requestModel.returnUrl);
-            // 数据加密
-            String encryptionData = StringUtil.mergeCodeBase64(strData);
-            ResponseEncryptionJson resultDataModel = new ResponseEncryptionJson();
-            resultDataModel.jsonData = encryptionData;
-            // 返回数据给客户端
-            return JsonResult.successResult(resultDataModel, cgid, sgid);
         }catch (Exception e){
             Map<String,String> map = ExceptionMethod.getException(e, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
             log.error(String.format("this OrderOutController.sandQrCode() is error , the cgid=%s and sgid=%s and all data=%s!", cgid, sgid, data));

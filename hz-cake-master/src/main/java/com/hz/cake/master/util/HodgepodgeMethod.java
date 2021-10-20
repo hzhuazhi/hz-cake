@@ -6,6 +6,7 @@ import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
 import com.hz.cake.master.core.model.order.OrderOutModel;
+import com.hz.cake.master.core.model.order.OrderOutPrepareModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
 import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
@@ -2400,6 +2401,55 @@ public class HodgepodgeMethod {
         str = tmp.toString();
         return str;
     }
+
+
+    /**
+     * @Description: 组装添加代付订单的方法-衫德代付-task(预备请求)
+     * @param requestModel - 请求的基本数据
+     * @param channelModel - 商户信息
+     * @param orderNo - 订单号
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutPrepareModel assembleOrderOutPrepareAdd(ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo){
+        OrderOutPrepareModel resBean = new OrderOutPrepareModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+        resBean.setOrderType(2);
+        resBean.setHandleType(1);
+
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        if (!StringUtils.isBlank(requestModel.inBankSubbranch)){
+            resBean.setInBankSubbranch(requestModel.inBankSubbranch);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankProvince)){
+            resBean.setInBankProvince(requestModel.inBankProvince);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankCity)){
+            resBean.setInBankCity(requestModel.inBankCity);
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+
+        resBean.setChannelId(channelModel.getId());
+        if (!StringUtils.isBlank(channelModel.getAlias())){
+            resBean.setChannelName(channelModel.getAlias());
+        }
+
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+
+        return resBean;
+    }
+
+
+
 
 
 

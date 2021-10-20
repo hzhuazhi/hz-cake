@@ -59,7 +59,7 @@ public class ChannelModel extends BasePage implements Serializable {
     private Integer invalidTimeNum;
 
     /**
-     * 代付方式：0初始化，1手动转账，2API转账
+     * 代付方式：0初始化，1直接转账，2预备转账（预备是走TASK）
      */
     private Integer replacePayType;
 
