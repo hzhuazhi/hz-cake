@@ -6,6 +6,8 @@ import com.hz.cake.master.core.common.exception.ServiceException;
 import com.hz.cake.master.core.common.service.impl.BaseServiceImpl;
 import com.hz.cake.master.core.common.utils.constant.CacheKey;
 import com.hz.cake.master.core.common.utils.constant.CachedKeyUtils;
+import com.hz.cake.master.core.common.utils.jinfupay.JinFuApi;
+import com.hz.cake.master.core.common.utils.jinfupay.model.JinFuPayResponse;
 import com.hz.cake.master.core.common.utils.sandpay.method.AgentPay;
 import com.hz.cake.master.core.common.utils.sandpay.model.AgentPayResponse;
 import com.hz.cake.master.core.mapper.MerchantBalanceDeductMapper;
@@ -274,6 +276,70 @@ public class OrderOutServiceImpl<T> extends BaseServiceImpl<T> implements OrderO
             str = strCache;
             return str;
         }
+    }
+
+
+
+
+    @Override
+    public ReplacePayModel screenReplacePayJinFu(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception {
+        ReplacePayModel replacePayModel = null;
+        for (ReplacePayModel replacePayData : replacePayList){
+            // 删选代付，调用金服代付
+            replacePayModel = getReplacePayDataJinFu(replacePayData, orderOutModel);
+            if (replacePayModel != null && replacePayModel.getId() != null && replacePayModel.getId() > 0){
+                log.info("");
+                // 扣除此卡商的余额
+                for (MerchantModel merchantData : merchantList){
+                    if (merchantData.getId() == replacePayModel.getMerchantId()){
+                        getMerchantData(merchantData, orderOutModel.getOrderMoney(), orderOutModel.getOrderNo());
+                    }
+                }
+                return replacePayModel;
+            }
+        }
+
+        return null;
+    }
+
+
+
+
+    /**
+     * @Description: check校验被筛选的代付的使用状态-金服
+     * @param replacePayModel - 代付信息
+     * @param orderOutModel - 订单信息
+     * @return BankModel
+     * @author yoko
+     * @date 2020/9/12 21:02
+     */
+    public ReplacePayModel getReplacePayDataJinFu(ReplacePayModel replacePayModel, OrderOutModel orderOutModel) throws Exception{
+        // 判断此代付是否被锁住
+        String lockKey_replacePay = CachedKeyUtils.getCacheKey(CacheKey.LOCK_REPLACE_PAY, replacePayModel.getId());
+        boolean flagLock_replacePay = ComponentUtil.redisIdService.lock(lockKey_replacePay);
+        if (flagLock_replacePay){
+            // 校验代付是否受到付款限制
+            boolean flag = checkReplacePayLimit(replacePayModel);
+            if (flag){
+                if (!StringUtils.isBlank(replacePayModel.getOpenTimeSlot())){
+                    // 校验代付的放量时间
+                    boolean flag_openTime = HodgepodgeMethod.checkOpenTimeSlot(replacePayModel.getOpenTimeSlot());
+                    if (flag_openTime){
+                        // 请求金服代付
+                        JinFuPayResponse jinFuPayResponse = JinFuApi.jinFuPay(replacePayModel, orderOutModel);
+                        if (jinFuPayResponse != null && jinFuPayResponse.code == 0){
+                            // 解锁
+                            ComponentUtil.redisIdService.delLock(lockKey_replacePay);
+                            return replacePayModel;
+                        }
+                    }
+                }
+
+            }
+            // 解锁
+            ComponentUtil.redisIdService.delLock(lockKey_replacePay);
+        }
+        return null;
     }
 
 

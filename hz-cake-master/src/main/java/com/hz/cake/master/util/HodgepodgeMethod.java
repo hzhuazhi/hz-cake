@@ -2138,12 +2138,13 @@ public class HodgepodgeMethod {
      *     从缓存中获取上次给出码的代付ID
      *     数据来由：每次给出之后，把代付ID进行纪录
      * </p>
+     * @param resourceType - 代付资源类型：1杉德支付，2金服支付
      * @return
      * @author yoko
      * @date 2020/5/21 15:38
      */
-    public static long getMaxReplacePayRedis() throws Exception{
-        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY);
+    public static long getMaxReplacePayRedis(int resourceType) throws Exception{
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY, resourceType);
         String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
         if (!StringUtils.isBlank(strCache)) {
             return Long.parseLong(strCache);
@@ -2330,13 +2331,14 @@ public class HodgepodgeMethod {
 
     /**
      * @Description: redis：添加给出的代付ID
+     * @param resourceType - 代付资源类型：1杉德支付，2金服支付
      * @param replacePayId - 代付ID
      * @return void
      * @author yoko
      * @date 2020/10/10 15:44
      */
-    public static void saveMaxreplacePayByRedis(long replacePayId){
-        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY, replacePayId);
+    public static void saveMaxreplacePayByRedis(int resourceType, long replacePayId){
+        String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.REPLACE_PAY, resourceType);
         ComponentUtil.redisService.set(strKeyCache, String.valueOf(replacePayId));
     }
 
@@ -2453,6 +2455,91 @@ public class HodgepodgeMethod {
         return resBean;
     }
 
+
+
+
+
+    /**
+     * @Description: 组装金服代付订单的方法
+     * @param requestModel - 请求数据
+     * @param orderNo - 订单号
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutJinFu(ProtocolOrderOut requestModel, String orderNo) throws Exception{
+        OrderOutModel resBean = new OrderOutModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        if (!StringUtils.isBlank(requestModel.inBankSubbranch)){
+            resBean.setInBankSubbranch(requestModel.inBankSubbranch);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankProvince)){
+            resBean.setInBankProvince(requestModel.inBankProvince);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankCity)){
+            resBean.setInBankCity(requestModel.inBankCity);
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+        log.info("");
+        resBean.setTradeTime(String.valueOf(DateUtil.getNowLongTime()));
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+
+    /**
+     * @Description: 组装添加代付订单的方法-金服代付
+     * @param orderOutModel - 代付订单信息-部分信息
+     * @param replacePayModel - 代付信息
+     * @param merchantList - 卡商集合
+     * @param channelModel - 商户信息
+     * @param serviceCharge - 卡商手续费
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutByJinFuAdd(OrderOutModel orderOutModel, ReplacePayModel replacePayModel, List<MerchantModel> merchantList, ChannelModel channelModel, String serviceCharge){
+        OrderOutModel resBean = new OrderOutModel();
+        resBean = orderOutModel;
+
+        MerchantModel merchantModel = null;
+        for (MerchantModel merchantData : merchantList){
+            if (merchantData.getId() == replacePayModel.getMerchantId()){
+                merchantModel = merchantData;
+            }
+        }
+        resBean.setOrderType(merchantModel.getPayType());
+        if (!StringUtils.isBlank(serviceCharge)){
+            resBean.setServiceCharge(serviceCharge);
+        }
+        resBean.setMerchantId(merchantModel.getId());
+        if (!StringUtils.isBlank(merchantModel.getAcName())){
+            resBean.setMerchantName(merchantModel.getAcName());
+        }
+        resBean.setChannelId(channelModel.getId());
+        if (!StringUtils.isBlank(channelModel.getAlias())){
+            resBean.setChannelName(channelModel.getAlias());
+        }
+        log.info("");
+        resBean.setOrderType(2);// 订单类型：1手动转账，2API转账
+        resBean.setHandleType(2);// 订单处理类型：1我方处理，2第三方处理
+        resBean.setOutStatus(2);// 代付订单出码状态:1初始化（我方处理默认初始化），2出码成功（第三方反馈结果），3出码失败
+        resBean.setReplacePayId(replacePayModel.getId());
+        resBean.setReplacePayName(replacePayModel.getAlias());
+        resBean.setResourceType(replacePayModel.getResourceType());
+        return resBean;
+    }
 
 
 

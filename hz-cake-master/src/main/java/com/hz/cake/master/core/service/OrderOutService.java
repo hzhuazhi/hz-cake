@@ -30,7 +30,7 @@ public interface OrderOutService<T> extends BaseService<T> {
 
 
     /**
-     * @Description: 筛选代付
+     * @Description: 筛选代付-杉德
      * @param replacePayList - 代付集合
      * @param merchantList - 卡商集合
      * @param orderOutModel - 订单信息
@@ -39,4 +39,16 @@ public interface OrderOutService<T> extends BaseService<T> {
      * @date 2021/6/21 11:35
     */
     public ReplacePayModel screenReplacePay(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception;
+
+
+    /**
+     * @Description: 筛选代付-金服
+     * @param replacePayList - 代付集合
+     * @param merchantList - 卡商集合
+     * @param orderOutModel - 订单信息
+     * @return
+     * @author yoko
+     * @date 2021/6/21 11:35
+     */
+    public ReplacePayModel screenReplacePayJinFu(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception;
 }

@@ -261,6 +261,8 @@ public class OrderOutController {
                 requestModel.money = requestModel.money + ".00";
             }
 
+            int resourceType = 1;// 代付资源类型：1杉德支付，2金服支付
+
 
             // 策略数据：出码开关
             StrategyModel strategyQrCodeSwitchQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.OUT_QR_CODE_SWITCH.getStgType());
@@ -323,10 +325,10 @@ public class OrderOutController {
                 long maxReplacePayId = 0;
 
                 // 获取上次给出的代付ID
-                maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
+                maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis(resourceType);
 
                 // 查询代付集合数据
-                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money, 1);
+                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money, resourceType);
                 List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
                 HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
 
@@ -367,7 +369,7 @@ public class OrderOutController {
                 }
 
                 // 存储redis：给出的代付ID，用于字段maxReplacePayId
-                HodgepodgeMethod.saveMaxreplacePayByRedis( replacePayData.getId());
+                HodgepodgeMethod.saveMaxreplacePayByRedis(resourceType, replacePayData.getId());
 
                 // 组装返回客户端的数据
                 long stime = System.currentTimeMillis();
@@ -431,7 +433,7 @@ public class OrderOutController {
      */
     @RequestMapping(value = "/jinfuQrCode", method = {RequestMethod.POST})
     public JsonResult<Object> jinfuQrCode(HttpServletRequest request, HttpServletResponse response, @RequestBody RequestEncryptionJson requestData) throws Exception{
-        String sgid = "CDFA" + ComponentUtil.redisIdService.getNewId();
+        String sgid = "JF" + ComponentUtil.redisIdService.getNewId();
         String cgid = "";
         String token = "";
         String ip = StringUtil.getIpAddress(request);
@@ -444,13 +446,14 @@ public class OrderOutController {
             data = StringUtil.decoderBase64(requestData.jsonData);
             requestModel  = JSON.parseObject(data, ProtocolOrderOut.class);
 
-            log.info("");
             // check校验数据
             HodgepodgeMethod.checkOrderOutAdd(requestModel);
 
             if (requestModel.money.indexOf(".") <= -1){
                 requestModel.money = requestModel.money + ".00";
             }
+
+            int resourceType = 2;// 代付资源类型：1杉德支付，2金服支付
 
 
             // 策略数据：出码开关
@@ -514,10 +517,10 @@ public class OrderOutController {
                 long maxReplacePayId = 0;
 
                 // 获取上次给出的代付ID
-                maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
+                maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis(resourceType);
 
                 // 查询代付集合数据
-                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money, 1);
+                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money, resourceType);
                 List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
                 HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
 
@@ -532,11 +535,11 @@ public class OrderOutController {
                     sortList.sort((x, y) -> Double.compare(Double.parseDouble(x.getDayMoney()), Double.parseDouble(y.getDayMoney())));
                 }
 
-                // 组装请求衫德的订单信息
-                OrderOutModel orderOutSand = HodgepodgeMethod.assembleOrderOutSand(requestModel, sgid);
+                // 组装请求金服的订单信息
+                OrderOutModel orderOutJinFu = HodgepodgeMethod.assembleOrderOutJinFu(requestModel, sgid);
 
                 // 筛选可用的代付
-                ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePay(sortList, merchantList, orderOutSand);
+                ReplacePayModel replacePayData = ComponentUtil.orderOutService.screenReplacePayJinFu(sortList, merchantList, orderOutJinFu);
                 HodgepodgeMethod.checkScreenReplacePayNull(replacePayData);
 
                 String serviceCharge = "";// 卡商手续费
@@ -546,7 +549,7 @@ public class OrderOutController {
                 serviceCharge = HodgepodgeMethod.getMerchantServiceCharge(merchantServiceChargeModel);
 
                 // 添加代付订单
-                OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutBySandAdd(orderOutSand, replacePayData, merchantList, channelModel, serviceCharge);
+                OrderOutModel orderOutModel = HodgepodgeMethod.assembleOrderOutByJinFuAdd(orderOutJinFu, replacePayData, merchantList, channelModel, serviceCharge);
                 int num = ComponentUtil.orderOutService.add(orderOutModel);
                 HodgepodgeMethod.checkAddOrderOutIsOk(num);
 
@@ -558,7 +561,7 @@ public class OrderOutController {
                 }
 
                 // 存储redis：给出的代付ID，用于字段maxReplacePayId
-                HodgepodgeMethod.saveMaxreplacePayByRedis( replacePayData.getId());
+                HodgepodgeMethod.saveMaxreplacePayByRedis(resourceType, replacePayData.getId());
 
                 // 组装返回客户端的数据
                 long stime = System.currentTimeMillis();
@@ -581,9 +584,9 @@ public class OrderOutController {
             }
         }catch (Exception e){
             Map<String,String> map = ExceptionMethod.getException(e, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
-            log.error(String.format("this OrderOutController.sandQrCode() is error , the cgid=%s and sgid=%s and all data=%s!", cgid, sgid, data));
+            log.error(String.format("this OrderOutController.jinfuQrCode() is error , the cgid=%s and sgid=%s and all data=%s!", cgid, sgid, data));
             if (!StringUtils.isBlank(map.get("dbCode"))){
-                log.error(String.format("this OrderOutController.sandQrCode() is error codeInfo, the dbCode=%s and dbMessage=%s !", map.get("dbCode"), map.get("dbMessage")));
+                log.error(String.format("this OrderOutController.jinfuQrCode() is error codeInfo, the dbCode=%s and dbMessage=%s !", map.get("dbCode"), map.get("dbMessage")));
             }
             e.printStackTrace();
             return JsonResult.failedResult(map.get("message"), map.get("code"), cgid, sgid);
