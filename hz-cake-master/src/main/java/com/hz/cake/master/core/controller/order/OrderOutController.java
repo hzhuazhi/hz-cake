@@ -326,7 +326,7 @@ public class OrderOutController {
                 maxReplacePayId = HodgepodgeMethod.getMaxReplacePayRedis();
 
                 // 查询代付集合数据
-                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money);
+                ReplacePayModel replacePayModel = HodgepodgeMethod.assembleReplacePayQuery(merchantList, requestModel.money, 1);
                 List<ReplacePayModel> replacePayList = ComponentUtil.replacePayService.getReplacePayList(replacePayModel);
                 HodgepodgeMethod.checkReplacePayIsNullByOutOrder(replacePayList);
 

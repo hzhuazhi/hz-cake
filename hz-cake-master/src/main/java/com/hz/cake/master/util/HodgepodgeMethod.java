@@ -2157,16 +2157,20 @@ public class HodgepodgeMethod {
      * @Description: 组装查询代付的查询条件
      * @param merchantList - 卡商集合
      * @param orderMoney - 订单金额
+     * @param resourceType - 代付资源类型：1杉德支付，2金服支付
      * @return com.hz.cake.master.core.model.replacepay.ReplacePayModel
      * @author yoko
      * @date 2021/6/21 11:05
      */
-    public static ReplacePayModel assembleReplacePayQuery(List<MerchantModel> merchantList, String orderMoney){
+    public static ReplacePayModel assembleReplacePayQuery(List<MerchantModel> merchantList, String orderMoney, int resourceType){
         ReplacePayModel resBean = new ReplacePayModel();
         List<Long> merchantIdList = merchantList.stream().map(MerchantModel::getId).collect(Collectors.toList());
         resBean.setMerchantIdList(merchantIdList);
         BigDecimal bd = new BigDecimal(orderMoney);
         resBean.setMoney(bd);
+        if (resourceType > 0){
+            resBean.setResourceType(resourceType);
+        }
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         return resBean;
     }
