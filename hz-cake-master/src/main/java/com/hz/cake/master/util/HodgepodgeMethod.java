@@ -2323,7 +2323,7 @@ public class HodgepodgeMethod {
         resBean.setOutStatus(2);// 代付订单出码状态:1初始化（我方处理默认初始化），2出码成功（第三方反馈结果），3出码失败
         resBean.setReplacePayId(replacePayModel.getId());
         resBean.setReplacePayName(replacePayModel.getAlias());
-
+        resBean.setResourceType(replacePayModel.getResourceType());
         return resBean;
     }
 
@@ -2352,6 +2352,7 @@ public class HodgepodgeMethod {
     public static ReplacePayGainModel assembleReplacePayGainAdd(OrderOutModel orderOutModel, ReplacePayModel replacePayModel){
         ReplacePayGainModel resBean = new ReplacePayGainModel();
         resBean.setReplacePayId(replacePayModel.getId());
+        resBean.setResourceType(replacePayModel.getResourceType());
         resBean.setOrderNo(orderOutModel.getOrderNo());
         resBean.setOrderMoney(orderOutModel.getOrderMoney());
         resBean.setTradeTime(Long.parseLong(orderOutModel.getTradeTime()));

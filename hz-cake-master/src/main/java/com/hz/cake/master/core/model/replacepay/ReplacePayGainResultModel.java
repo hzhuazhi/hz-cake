@@ -28,6 +28,11 @@ public class ReplacePayGainResultModel extends BasePage implements Serializable 
     private Long replacePayId;
 
     /**
+     * 代付资源类型：1杉德支付，2金服支付
+     */
+    private Integer resourceType;
+
+    /**
      * 订单号
      */
     private String orderNo;
@@ -288,5 +293,13 @@ public class ReplacePayGainResultModel extends BasePage implements Serializable 
 
     public void setYn(Integer yn) {
         this.yn = yn;
+    }
+
+    public Integer getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(Integer resourceType) {
+        this.resourceType = resourceType;
     }
 }
