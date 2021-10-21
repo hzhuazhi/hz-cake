@@ -45,6 +45,7 @@ public class JinFuApi {
         log.info("JinFuApi.jinFuPay-----------parameter:" + parameter);
         String resData = HttpUtil.doPostJson(replacePayModel.getOutInterfaceAds(), parameter);
         log.info("----JinFuApi.jinFuPay----resData:" + resData);
+//        resData = "{\"code\":0,\"count\":0,\"data\":null,\"message\":null,\"msg\":\"请求成功!\",\"result\":null,\"status\":0}";
         JinFuPayResponse result = JSON.parseObject(resData, JinFuPayResponse.class);
         return result;
     }

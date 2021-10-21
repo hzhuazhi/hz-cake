@@ -184,6 +184,11 @@ public class OrderOutPrepareModel extends BasePage implements Serializable {
     private String notifyUrl;
 
     /**
+     * 审核状态(审核成功才进行API请求)：1初始化，2审核收款失败，3系统自动审核，4审核收款成功
+     */
+    private Integer checkStatus;
+
+    /**
      * 补充数据的类型：1初始化，2补充数据失败（其它原因等..），3补充数据成功
      */
     private Integer workType;
