@@ -2359,10 +2359,17 @@ public class HodgepodgeMethod {
         resBean.setOrderMoney(orderOutModel.getOrderMoney());
         resBean.setTradeTime(Long.parseLong(orderOutModel.getTradeTime()));
 
+        String next_time = "";
         if (replacePayModel.getGainDataTimeType() == 1){
-
+            next_time = DateUtil.addDateMinute(1);
+        }else if (replacePayModel.getGainDataTimeType() == 2){
+            next_time = DateUtil.addDateMinute(Integer.parseInt(replacePayModel.getGainDataTime()));
+        }else if (replacePayModel.getGainDataTimeType() == 3){
+            // 获取第一下标位：因为这里的时间属于集合时间
+            String [] strArr = replacePayModel.getGainDataTime().split("#");
+            next_time = DateUtil.addDateMinute(Integer.parseInt(strArr[0]));
         }
-        String next_time = DateUtil.addDateMinute(1);
+
         resBean.setNextTime(next_time);
         resBean.setNowGainDataTime("1");// 默认1的话，下次取时间则是代付的第一个时间位
         resBean.setCurday(DateUtil.getDayNumber(new Date()));

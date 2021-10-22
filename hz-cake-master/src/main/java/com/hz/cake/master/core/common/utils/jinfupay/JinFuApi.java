@@ -88,7 +88,7 @@ public class JinFuApi {
         String mySign = SecurityUtil.sign(replacePayModel.getPublicKey(), SecurityUtil.map2str(sendDataMap));
         sendDataMap.put("sign", mySign);
         String parameter = JSON.toJSONString(sendDataMap);
-        String resData = HttpUtil.doPostJson(replacePayModel.getInInterfaceAds(), parameter);
+        String resData = HttpUtil.doPostJson(replacePayModel.getBalanceInterfaceAds(), parameter);
         log.info("----JinFuApi.jinFuQueryBalance----resData:" + resData);
         JinFuPayResponse result = JSON.parseObject(resData, JinFuPayResponse.class);
         return result;
