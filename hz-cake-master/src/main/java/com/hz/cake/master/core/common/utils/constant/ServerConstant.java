@@ -118,6 +118,7 @@ public class ServerConstant {
         EXCEL_NUM(31,""),
         EXCEL_MONEY(32,""),
         REPLACE_PAY_TYPE(33,""),
+        REPLACE_PAY_BLACK_LIST_RULE(34,""),
 
 
 

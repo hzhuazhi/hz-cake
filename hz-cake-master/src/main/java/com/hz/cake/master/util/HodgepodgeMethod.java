@@ -5,6 +5,7 @@ import com.hz.cake.master.core.common.utils.StringUtil;
 import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
+import com.hz.cake.master.core.model.order.OrderOutLimitModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.order.OrderOutPrepareModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
@@ -2422,11 +2423,12 @@ public class HodgepodgeMethod {
      * @param requestModel - 请求的基本数据
      * @param channelModel - 商户信息
      * @param orderNo - 订单号
+     * @param resourceType - 代付资源类型：1杉德支付，2金服支付
      * @return OrderModel
      * @author yoko
      * @date 2020/9/13 14:41
      */
-    public static OrderOutPrepareModel assembleOrderOutPrepareAdd(ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo){
+    public static OrderOutPrepareModel assembleOrderOutPrepareAdd(ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo, int resourceType){
         OrderOutPrepareModel resBean = new OrderOutPrepareModel();
         resBean.setOrderNo(orderNo);
         resBean.setOrderMoney(requestModel.money);
@@ -2455,6 +2457,7 @@ public class HodgepodgeMethod {
             resBean.setChannelName(channelModel.getAlias());
         }
 
+        resBean.setResourceType(resourceType);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
@@ -2546,6 +2549,38 @@ public class HodgepodgeMethod {
         resBean.setReplacePayName(replacePayModel.getAlias());
         resBean.setResourceType(replacePayModel.getResourceType());
         return resBean;
+    }
+
+    /**
+     * @Description: 组装代付查询黑名单的查询条件
+     * @param accountName - 开户人姓名
+     * @param bankCard - 开户人卡号
+     * @return com.hz.cake.master.core.model.order.OrderOutLimitModel
+     * @Author: yoko
+     * @Date 2021/10/25 15:22
+     */
+    public static OrderOutLimitModel assembleOrderOutLimitQuery(String accountName, String bankCard){
+        OrderOutLimitModel resBean = new OrderOutLimitModel();
+        if (!StringUtils.isBlank(accountName)){
+            resBean.setAccountName(accountName);
+        }
+        if (!StringUtils.isBlank(bankCard)){
+            resBean.setBankCard(bankCard);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: check黑名单数据是否为空-代付订单
+     * @param orderOutLimitModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static void checkOrderOutLimitModelIsNotNull(OrderOutLimitModel orderOutLimitModel) throws Exception{
+        if (orderOutLimitModel != null && orderOutLimitModel.getId() != null){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.OU00013.geteCode(), ErrorCode.ENUM_ERROR.OU00013.geteDesc());
+        }
     }
 
 

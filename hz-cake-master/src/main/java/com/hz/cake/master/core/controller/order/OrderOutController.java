@@ -11,6 +11,7 @@ import com.hz.cake.master.core.model.channel.ChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantChannelModel;
 import com.hz.cake.master.core.model.merchant.MerchantModel;
 import com.hz.cake.master.core.model.merchant.MerchantServiceChargeModel;
+import com.hz.cake.master.core.model.order.OrderOutLimitModel;
 import com.hz.cake.master.core.model.order.OrderOutModel;
 import com.hz.cake.master.core.model.order.OrderOutPrepareModel;
 import com.hz.cake.master.core.model.region.RegionModel;
@@ -135,6 +136,26 @@ public class OrderOutController {
             StrategyModel strategyReplacePayInvalidTimeNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_INVALID_TIME_NUM.getStgType());
             StrategyModel strategyReplacePayInvalidTimeNumModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayInvalidTimeNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             replacePayInvalidTimeNum = strategyReplacePayInvalidTimeNumModel.getStgNumValue();
+
+            // 策略数据：代付黑名单校验规则
+            int replacePayBlackListRule = 0; // 代付黑名单校验规则：1根据姓名校验，2根据银行卡卡号校验，3根据姓名+银行卡校验
+            StrategyModel strategyReplacePayBlackListRuleQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_BLACK_LIST_RULE.getStgType());
+            StrategyModel strategyReplacePayBlackListRuleModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayBlackListRuleQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayBlackListRule = strategyReplacePayBlackListRuleModel.getStgNumValue();
+
+
+            OrderOutLimitModel orderOutLimitQuery = null;
+            if (replacePayBlackListRule == 1){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, null);
+            }else if (replacePayBlackListRule == 2){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(null, requestModel.inBankCard);
+            }else if (replacePayBlackListRule == 3){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, requestModel.inBankCard);
+            }
+
+            // check校验黑名单
+            OrderOutLimitModel orderOutLimitModel = (OrderOutLimitModel)ComponentUtil.orderOutLimitService.findByObject(orderOutLimitQuery);
+            HodgepodgeMethod.checkOrderOutLimitModelIsNotNull(orderOutLimitModel);
 
 
             // 根据秘钥获取商户信息
@@ -288,6 +309,27 @@ public class OrderOutController {
             StrategyModel strategyReplacePayTypeModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayTypeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             replacePayType = strategyReplacePayTypeModel.getStgNumValue();
 
+            // 策略数据：代付黑名单校验规则
+            int replacePayBlackListRule = 0; // 代付黑名单校验规则：1根据姓名校验，2根据银行卡卡号校验，3根据姓名+银行卡校验
+            StrategyModel strategyReplacePayBlackListRuleQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_BLACK_LIST_RULE.getStgType());
+            StrategyModel strategyReplacePayBlackListRuleModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayBlackListRuleQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayBlackListRule = strategyReplacePayBlackListRuleModel.getStgNumValue();
+
+
+            OrderOutLimitModel orderOutLimitQuery = null;
+            if (replacePayBlackListRule == 1){
+                log.info("");
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, null);
+            }else if (replacePayBlackListRule == 2){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(null, requestModel.inBankCard);
+            }else if (replacePayBlackListRule == 3){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, requestModel.inBankCard);
+            }
+
+            // check校验黑名单
+            OrderOutLimitModel orderOutLimitModel = (OrderOutLimitModel)ComponentUtil.orderOutLimitService.findByObject(orderOutLimitQuery);
+            HodgepodgeMethod.checkOrderOutLimitModelIsNotNull(orderOutLimitModel);
+
 
 
             // 根据秘钥获取商户信息
@@ -382,7 +424,7 @@ public class OrderOutController {
                 return JsonResult.successResult(resultDataModel, cgid, sgid);
             }else{
                 // 预备转账：需要先把订单数据存储到预付订单里面
-                OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid);
+                OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid, 1);
                 int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
                 if (num > 0){
                     return JsonResult.successResult(null, cgid, sgid);
@@ -481,6 +523,28 @@ public class OrderOutController {
             replacePayType = strategyReplacePayTypeModel.getStgNumValue();
 
 
+            // 策略数据：代付黑名单校验规则
+            int replacePayBlackListRule = 0; // 代付黑名单校验规则：1根据姓名校验，2根据银行卡卡号校验，3根据姓名+银行卡校验
+            StrategyModel strategyReplacePayBlackListRuleQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLACE_PAY_BLACK_LIST_RULE.getStgType());
+            StrategyModel strategyReplacePayBlackListRuleModel = ComponentUtil.strategyService.getStrategyModel(strategyReplacePayBlackListRuleQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+            replacePayBlackListRule = strategyReplacePayBlackListRuleModel.getStgNumValue();
+
+
+            OrderOutLimitModel orderOutLimitQuery = null;
+            if (replacePayBlackListRule == 1){
+                log.info("1");
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, null);
+            }else if (replacePayBlackListRule == 2){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(null, requestModel.inBankCard);
+            }else if (replacePayBlackListRule == 3){
+                orderOutLimitQuery = HodgepodgeMethod.assembleOrderOutLimitQuery(requestModel.inAccountName, requestModel.inBankCard);
+            }
+
+            // check校验黑名单
+            OrderOutLimitModel orderOutLimitModel = (OrderOutLimitModel)ComponentUtil.orderOutLimitService.findByObject(orderOutLimitQuery);
+            HodgepodgeMethod.checkOrderOutLimitModelIsNotNull(orderOutLimitModel);
+
+
 
             // 根据秘钥获取商户信息
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
@@ -574,7 +638,7 @@ public class OrderOutController {
                 return JsonResult.successResult(resultDataModel, cgid, sgid);
             }else{
                 // 预备转账：需要先把订单数据存储到预付订单里面
-                OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid);
+                OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid, 2);
                 int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
                 if (num > 0){
                     return JsonResult.successResult(null, cgid, sgid);
