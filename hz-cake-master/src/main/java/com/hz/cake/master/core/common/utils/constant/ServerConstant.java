@@ -119,6 +119,8 @@ public class ServerConstant {
         EXCEL_MONEY(32,""),
         REPLACE_PAY_TYPE(33,""),
         REPLACE_PAY_BLACK_LIST_RULE(34,""),
+        REPLACE_PAY_DELAY_TIME_NUM(35,""),
+        REPLACE_PAY_CHECK(36,""),
 
 
 

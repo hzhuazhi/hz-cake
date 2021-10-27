@@ -179,6 +179,11 @@ public class OrderOutModel extends BasePage implements Serializable {
     private String pictureAds;
 
     /**
+     * 失败缘由
+     */
+    private String failInfo;
+
+    /**
      * 审核状态：1初始化，2审核收款失败，3系统自动审核，4审核收款成功
      */
     private Integer checkStatus;
@@ -753,5 +758,13 @@ public class OrderOutModel extends BasePage implements Serializable {
 
     public void setResourceType(Integer resourceType) {
         this.resourceType = resourceType;
+    }
+
+    public String getFailInfo() {
+        return failInfo;
+    }
+
+    public void setFailInfo(String failInfo) {
+        this.failInfo = failInfo;
     }
 }

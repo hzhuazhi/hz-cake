@@ -255,6 +255,9 @@
             <if test="pictureAds != null and pictureAds != '' " >
                 picture_ads,
             </if>
+            <if test="failInfo != null and failInfo != '' " >
+                fail_info,
+            </if>
             <if test="checkStatus != null and checkStatus != '' " >
                 check_status,
             </if>
@@ -399,6 +402,9 @@
             </if>
             <if test="pictureAds != null and pictureAds != '' " >
                 <![CDATA[  #{pictureAds}, ]]>
+            </if>
+            <if test="failInfo != null and failInfo != '' " >
+                <![CDATA[  #{failInfo}, ]]>
             </if>
             <if test="checkStatus != null and checkStatus != '' " >
                 <![CDATA[  #{checkStatus}, ]]>
@@ -548,6 +554,12 @@
             </if>
             <if test="pictureAds != null and pictureAds != '' " >
                 a.picture_ads = #{pictureAds},
+            </if>
+            <if test="pictureAds != null and pictureAds != '' " >
+                a.picture_ads = #{pictureAds},
+            </if>
+            <if test="failInfo != null and failInfo != '' " >
+                a.fail_info = #{failInfo},
             </if>
             <if test="checkStatus != null and checkStatus != '' " >
                 a.check_status = #{checkStatus},
