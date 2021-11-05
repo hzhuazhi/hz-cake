@@ -39,7 +39,6 @@
                     #{item}
                 </foreach>
             </if>
-
             and a.yn = 0
         </trim>
     </sql>

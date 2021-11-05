@@ -426,7 +426,6 @@
             <if test="publicKey != null and publicKey != '' " >
                 a.public_key = #{publicKey},
             </if>
-
             <if test="publicKeyPath != null and publicKeyPath != '' " >
                 a.public_key_path = #{publicKeyPath},
             </if>
