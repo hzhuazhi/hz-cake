@@ -2584,6 +2584,44 @@ public class HodgepodgeMethod {
     }
 
 
+    /**
+     * @Description: 组装汇潮代付订单的方法
+     * @param requestModel - 请求数据
+     * @param orderNo - 订单号
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutHuiChao(ProtocolOrderOut requestModel, String orderNo) throws Exception{
+        OrderOutModel resBean = new OrderOutModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        if (!StringUtils.isBlank(requestModel.inBankSubbranch)){
+            resBean.setInBankSubbranch(requestModel.inBankSubbranch);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankProvince)){
+            resBean.setInBankProvince(requestModel.inBankProvince);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankCity)){
+            resBean.setInBankCity(requestModel.inBankCity);
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+        log.info("1");
+        resBean.setTradeTime(String.valueOf(DateUtil.getNowLongTime()));
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
 
 
 

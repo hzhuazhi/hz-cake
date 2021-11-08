@@ -51,4 +51,16 @@ public interface OrderOutService<T> extends BaseService<T> {
      * @date 2021/6/21 11:35
      */
     public ReplacePayModel screenReplacePayJinFu(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception;
+
+
+    /**
+     * @Description: 筛选代付-汇潮
+     * @param replacePayList - 代付集合
+     * @param merchantList - 卡商集合
+     * @param orderOutModel - 订单信息
+     * @return
+     * @author yoko
+     * @date 2021/6/21 11:35
+     */
+    public ReplacePayModel screenReplacePayHuiChao(List<ReplacePayModel> replacePayList, List<MerchantModel> merchantList, OrderOutModel orderOutModel) throws Exception;
 }
