@@ -7,6 +7,11 @@ import com.hz.cake.master.core.common.utils.huichaogpay.model.request.TransferRe
 import com.thoughtworks.xstream.XStream;
 import org.apache.logging.log4j.util.Base64Util;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+
 /**
  * @author yoko
  * @desc
@@ -138,5 +143,45 @@ public class HuiChaoMethod {
         return requestDomain;
     }
 
+
+
+    /**
+     * @Description: 将xml转换成实体Bean
+     * @param clazz - 要转换成的实体Bean
+     * @param xmlStr - xml字符串
+     * @return: T
+     * @author: yoko
+     * @date: 2021/11/5 21:13
+     * @version 1.0.0
+     */
+    public static <T> T convertXmlStrToObjectww(Class<T> clazz, String xmlStr) {
+        try {
+            XStream xStream = new XStream();
+            XStream.setupDefaultSecurity(xStream);
+            xStream.allowTypesByRegExp(new String[] { ".*" });
+            xStream.processAnnotations(clazz);
+            return (T) xStream.fromXML(xmlStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将String类型的xml转换成对象
+     */
+    public static Object convertXmlStrToObject(Class clazz, String xmlStr) {
+        Object xmlObject = null;
+        try {
+            JAXBContext context = JAXBContext.newInstance(clazz);
+            // 进行将Xml转成对象的核心接口
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            StringReader sr = new StringReader(xmlStr);
+            xmlObject = unmarshaller.unmarshal(sr);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return xmlObject;
+    }
 
 }
