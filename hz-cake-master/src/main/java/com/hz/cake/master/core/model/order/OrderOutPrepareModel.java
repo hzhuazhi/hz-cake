@@ -5,7 +5,7 @@ import com.hz.cake.master.core.protocol.page.BasePage;
 import java.io.Serializable;
 
 /**
- * @Description 代付预备请求的的实体属性Bean
+ * @Description 代付预备请求的实体属性Bean
  * @Author yoko
  * @Date 2020/10/29 17:33
  * @Version 1.0

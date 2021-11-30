@@ -2624,6 +2624,58 @@ public class HodgepodgeMethod {
 
 
 
+    /**
+     * @Description: 组装预请求代付时的代付订单信息
+     * @param requestModel - 请求数据
+     * @param channelModel - 渠道信息
+     * @param orderNo - 订单号
+     * @param resourceType - 代付资源类型：1杉德支付，2金服支付，3汇潮支付
+     * @return OrderModel
+     * @author yoko
+     * @date 2020/9/13 14:41
+     */
+    public static OrderOutModel assembleOrderOutByPrepare(ProtocolOrderOut requestModel, ChannelModel channelModel, String orderNo, int resourceType) throws Exception{
+        OrderOutModel resBean = new OrderOutModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(requestModel.money);
+        resBean.setOutTradeNo(requestModel.outTradeNo);
+
+        resBean.setInBankCard(requestModel.inBankCard);
+        resBean.setInBankName(requestModel.inBankName);
+        resBean.setInAccountName(requestModel.inAccountName);
+        if (!StringUtils.isBlank(requestModel.inBankSubbranch)){
+            resBean.setInBankSubbranch(requestModel.inBankSubbranch);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankProvince)){
+            resBean.setInBankProvince(requestModel.inBankProvince);
+        }
+        if (!StringUtils.isBlank(requestModel.inBankCity)){
+            resBean.setInBankCity(requestModel.inBankCity);
+        }
+        if (!StringUtils.isBlank(requestModel.notifyUrl)){
+            resBean.setNotifyUrl(requestModel.notifyUrl);
+        }
+
+        resBean.setChannelId(channelModel.getId());
+        if (!StringUtils.isBlank(channelModel.getAlias())){
+            resBean.setChannelName(channelModel.getAlias());
+        }
+
+        resBean.setOrderType(2);// 订单类型：1手动转账，2API转账
+        resBean.setHandleType(2);// 订单处理类型：1我方处理，2第三方处理
+        resBean.setOutStatus(1);// 代付订单出码状态:1初始化（我方处理默认初始化），2出码成功（第三方反馈结果），3出码失败
+        resBean.setResourceType(resourceType);
+
+        resBean.setTradeTime(String.valueOf(DateUtil.getNowLongTime()));
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+
+
 
 
 

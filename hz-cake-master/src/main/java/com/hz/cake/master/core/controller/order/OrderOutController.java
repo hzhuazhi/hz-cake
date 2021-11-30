@@ -425,8 +425,10 @@ public class OrderOutController {
             }else{
                 // 预备转账：需要先把订单数据存储到预付订单里面
                 OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid, resourceType);
-                int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
-                if (num > 0){
+                // 添加代付订单基础信息
+                OrderOutModel orderOutAdd = HodgepodgeMethod.assembleOrderOutByPrepare(requestModel, channelModel, sgid, resourceType);
+                boolean flag = ComponentUtil.orderOutPrepareService.handleOrderOutPrepare(orderOutPrepareAdd, orderOutAdd);
+                if (flag){
                     return JsonResult.successResult(null, cgid, sgid);
                 }else {
                     return JsonResult.failedResult(cgid, sgid);
@@ -639,8 +641,10 @@ public class OrderOutController {
             }else{
                 // 预备转账：需要先把订单数据存储到预付订单里面
                 OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid, resourceType);
-                int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
-                if (num > 0){
+                // 添加代付订单基础信息
+                OrderOutModel orderOutAdd = HodgepodgeMethod.assembleOrderOutByPrepare(requestModel, channelModel, sgid, resourceType);
+                boolean flag = ComponentUtil.orderOutPrepareService.handleOrderOutPrepare(orderOutPrepareAdd, orderOutAdd);
+                if (flag){
                     return JsonResult.successResult(null, cgid, sgid);
                 }else {
                     return JsonResult.failedResult(cgid, sgid);
@@ -854,8 +858,10 @@ public class OrderOutController {
             }else{
                 // 预备转账：需要先把订单数据存储到预付订单里面
                 OrderOutPrepareModel orderOutPrepareAdd = HodgepodgeMethod.assembleOrderOutPrepareAdd(requestModel, channelModel, sgid, resourceType);
-                int num  = ComponentUtil.orderOutPrepareService.add(orderOutPrepareAdd);
-                if (num > 0){
+                // 添加代付订单基础信息
+                OrderOutModel orderOutAdd = HodgepodgeMethod.assembleOrderOutByPrepare(requestModel, channelModel, sgid, resourceType);
+                boolean flag = ComponentUtil.orderOutPrepareService.handleOrderOutPrepare(orderOutPrepareAdd, orderOutAdd);
+                if (flag){
                     return JsonResult.successResult(null, cgid, sgid);
                 }else {
                     return JsonResult.failedResult(cgid, sgid);
