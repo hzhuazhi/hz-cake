@@ -127,6 +127,7 @@ public class OrderOutController {
             HodgepodgeMethod.checkStrategyByOutQrCodeSwitch(strategyQrCodeSwitchModel);
 
             // 策略数据：出码金额范围
+            String  outMoneyRange = "";
             StrategyModel strategyOrderMoneyRangeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.ORDER_OUT_MONEY_RANGE.getStgType());
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
@@ -162,6 +163,17 @@ public class OrderOutController {
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderChannelIsNull(channelModel);
+
+            // 金额出码范围的check：如果渠道没有配置出码金额范围，则使用总策略的出码金额范围；如果渠道配置了出码金额范围，则使用渠道的出码金额范围
+            if (!StringUtils.isBlank(channelModel.getOutMoneyRange())){
+                outMoneyRange = channelModel.getOutMoneyRange();
+            }else{
+                outMoneyRange = strategyOrderMoneyRangeModel.getStgValue();
+            }
+
+
+            // check校验出码金额范围是否合规
+            HodgepodgeMethod.checkOutOrderMoney(outMoneyRange, requestModel.money);
 
             // 根据渠道获取关联的卡商
             MerchantChannelModel merchantChannelQuery = HodgepodgeMethod.assembleMerchantChannelQuery(0,0,0, channelModel.getId(), 1);
@@ -291,6 +303,7 @@ public class OrderOutController {
             HodgepodgeMethod.checkStrategyByOutQrCodeSwitch(strategyQrCodeSwitchModel);
 
             // 策略数据：出码金额范围
+            String  outMoneyRange = "";
             StrategyModel strategyOrderMoneyRangeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.ORDER_OUT_MONEY_RANGE.getStgType());
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
@@ -336,6 +349,17 @@ public class OrderOutController {
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderChannelIsNull(channelModel);
+
+
+            // 金额出码范围的check：如果渠道没有配置出码金额范围，则使用总策略的出码金额范围；如果渠道配置了出码金额范围，则使用渠道的出码金额范围
+            if (!StringUtils.isBlank(channelModel.getOutMoneyRange())){
+                outMoneyRange = channelModel.getOutMoneyRange();
+            }else{
+                outMoneyRange = strategyOrderMoneyRangeModel.getStgValue();
+            }
+
+            // check校验出码金额范围是否合规
+            HodgepodgeMethod.checkOutOrderMoney(outMoneyRange, requestModel.money);
 
 
             if (channelModel.getReplacePayType() != null && channelModel.getReplacePayType() != 0){
@@ -506,6 +530,7 @@ public class OrderOutController {
             HodgepodgeMethod.checkStrategyByOutQrCodeSwitch(strategyQrCodeSwitchModel);
 
             // 策略数据：出码金额范围
+            String  outMoneyRange = "";
             StrategyModel strategyOrderMoneyRangeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.ORDER_OUT_MONEY_RANGE.getStgType());
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
@@ -552,6 +577,17 @@ public class OrderOutController {
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderChannelIsNull(channelModel);
+
+
+            // 金额出码范围的check：如果渠道没有配置出码金额范围，则使用总策略的出码金额范围；如果渠道配置了出码金额范围，则使用渠道的出码金额范围
+            if (!StringUtils.isBlank(channelModel.getOutMoneyRange())){
+                outMoneyRange = channelModel.getOutMoneyRange();
+            }else{
+                outMoneyRange = strategyOrderMoneyRangeModel.getStgValue();
+            }
+
+            // check校验出码金额范围是否合规
+            HodgepodgeMethod.checkOutOrderMoney(outMoneyRange, requestModel.money);
 
 
             if (channelModel.getReplacePayType() != null && channelModel.getReplacePayType() != 0){
@@ -723,9 +759,9 @@ public class OrderOutController {
             HodgepodgeMethod.checkStrategyByOutQrCodeSwitch(strategyQrCodeSwitchModel);
 
             // 策略数据：出码金额范围
+            String  outMoneyRange = "";
             StrategyModel strategyOrderMoneyRangeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.ORDER_OUT_MONEY_RANGE.getStgType());
             StrategyModel strategyOrderMoneyRangeModel = ComponentUtil.strategyService.getStrategyModel(strategyOrderMoneyRangeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
-            HodgepodgeMethod.checkOutOrderMoney(strategyOrderMoneyRangeModel.getStgValue(), requestModel.money);
 
 
             // 策略数据：代付出码规则
@@ -769,6 +805,17 @@ public class OrderOutController {
             ChannelModel channelQuery = HodgepodgeMethod.assembleChannelQuery(0, requestModel.secretKey, 1);
             ChannelModel channelModel = ComponentUtil.channelService.getChannel(channelQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
             HodgepodgeMethod.checkOutOrderChannelIsNull(channelModel);
+
+
+            // 金额出码范围的check：如果渠道没有配置出码金额范围，则使用总策略的出码金额范围；如果渠道配置了出码金额范围，则使用渠道的出码金额范围
+            if (!StringUtils.isBlank(channelModel.getOutMoneyRange())){
+                outMoneyRange = channelModel.getOutMoneyRange();
+            }else{
+                outMoneyRange = strategyOrderMoneyRangeModel.getStgValue();
+            }
+
+            // check校验出码金额范围是否合规
+            HodgepodgeMethod.checkOutOrderMoney(outMoneyRange, requestModel.money);
 
 
             if (channelModel.getReplacePayType() != null && channelModel.getReplacePayType() != 0){

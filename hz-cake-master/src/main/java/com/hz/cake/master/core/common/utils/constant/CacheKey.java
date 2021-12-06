@@ -183,5 +183,11 @@ public interface CacheKey {
     String LOCK_REPLACE_PAY = "-29";
 
 
+    /**
+     * 卡商绑定渠道的手续费
+     */
+    String MERCHANT_SERVICE_CHARGE = "-30";
+
+
 
 }
