@@ -53,5 +53,7 @@ public class ComponentUtil {
     public static OrderOutPrepareService orderOutPrepareService;
     public static OrderOutLimitService orderOutLimitService;
 
+    public static ZbWhitelistService zbWhitelistService;
+
 
 }

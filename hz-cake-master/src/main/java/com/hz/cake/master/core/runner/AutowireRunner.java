@@ -149,6 +149,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private OrderOutLimitService orderOutLimitService;
 
+    @Autowired
+    private ZbWhitelistService zbWhitelistService;
+
 
 
 
@@ -201,6 +204,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.replacePayGainResultService = replacePayGainResultService;
         ComponentUtil.orderOutPrepareService = orderOutPrepareService;
         ComponentUtil.orderOutLimitService = orderOutLimitService;
+
+        ComponentUtil.zbWhitelistService = zbWhitelistService;
 
         runThread = new RunThread();
         runThread.start();

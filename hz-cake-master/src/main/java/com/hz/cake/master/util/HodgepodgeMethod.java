@@ -1,7 +1,7 @@
 package com.hz.cake.master.util;
 
 import com.alibaba.fastjson.JSON;
-import com.hz.cake.master.core.common.utils.StringUtil;
+import com.hz.cake.master.core.common.utils.*;
 import com.hz.cake.master.core.model.bank.BankPoolModel;
 import com.hz.cake.master.core.model.channel.ChannelBankPoolModel;
 import com.hz.cake.master.core.model.merchant.*;
@@ -12,11 +12,13 @@ import com.hz.cake.master.core.model.replacepay.ReplacePayGainModel;
 import com.hz.cake.master.core.model.replacepay.ReplacePayModel;
 import com.hz.cake.master.core.model.statistics.StatisticsIpModel;
 import com.hz.cake.master.core.model.strategy.StrategyData;
+import com.hz.cake.master.core.model.zhongbang.ZbWhitelistModel;
 import com.hz.cake.master.core.protocol.request.issue.RequestIssue;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrder;
 import com.hz.cake.master.core.protocol.request.order.ProtocolOrderOut;
 import com.hz.cake.master.core.protocol.request.order.RequestOrder;
 import com.hz.cake.master.core.protocol.request.statistics.RequestStatisticsClickPay;
+import com.hz.cake.master.core.protocol.request.whitelist.RequestWhitelist;
 import com.hz.cake.master.core.protocol.response.ResponseData;
 import com.hz.cake.master.core.protocol.response.issue.Issue;
 import com.hz.cake.master.core.protocol.response.issue.ResponseIssue;
@@ -24,9 +26,6 @@ import com.hz.cake.master.core.protocol.response.order.Order;
 import com.hz.cake.master.core.protocol.response.order.OrderOut;
 import com.hz.cake.master.core.protocol.response.order.ResponseOrder;
 import com.hz.cake.master.core.common.exception.ServiceException;
-import com.hz.cake.master.core.common.utils.BeanUtils;
-import com.hz.cake.master.core.common.utils.DateUtil;
-import com.hz.cake.master.core.common.utils.ShortChainUtil;
 import com.hz.cake.master.core.common.utils.constant.CacheKey;
 import com.hz.cake.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.cake.master.core.common.utils.constant.ErrorCode;
@@ -2670,6 +2669,94 @@ public class HodgepodgeMethod {
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+    /**
+     * @Description: check众邦白名单添加的数据
+     * @param requestModel
+     * @return
+     * @author yoko
+     * @date 2020/05/14 15:57
+     */
+    public static void checkRequestWhitelistData(RequestWhitelist requestModel) throws Exception{
+        // 1.校验所有数据
+        if (requestModel == null ){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00001.geteCode(), ErrorCode.ENUM_ERROR.ZB00001.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.userSerialNo)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00002.geteCode(), ErrorCode.ENUM_ERROR.ZB00002.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.userName)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00003.geteCode(), ErrorCode.ENUM_ERROR.ZB00003.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.cardNum)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00004.geteCode(), ErrorCode.ENUM_ERROR.ZB00004.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.cardImgFront)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00005.geteCode(), ErrorCode.ENUM_ERROR.ZB00005.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.cardImgBack)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00006.geteCode(), ErrorCode.ENUM_ERROR.ZB00006.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.phoneNum)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00007.geteCode(), ErrorCode.ENUM_ERROR.ZB00007.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.bankCard)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00008.geteCode(), ErrorCode.ENUM_ERROR.ZB00008.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.notifyUrl)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00009.geteCode(), ErrorCode.ENUM_ERROR.ZB00009.geteDesc());
+        }
+        if (StringUtils.isBlank(requestModel.sign)){
+            throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00010.geteCode(), ErrorCode.ENUM_ERROR.ZB00010.geteDesc());
+        }else{
+            // 校验签名
+            boolean flag = checkZbWhitelist(requestModel);
+            if (!flag){
+                throw new ServiceException(ErrorCode.ENUM_ERROR.ZB00011.geteCode(), ErrorCode.ENUM_ERROR.ZB00011.geteDesc());
+            }
+
+        }
+    }
+
+
+    /**
+    * @Description:check校验众邦白名单的签名值
+    * @param requestModel
+    * @author: yoko
+    * @date: 2022/7/7 15:04
+    * @version 1.0.0
+    */
+    public static boolean checkZbWhitelist(RequestWhitelist requestModel){
+        // 校验sign签名
+        String checkSign = "";
+        checkSign = "userName=" + requestModel.userName + "&" + "cardNum=" + requestModel.cardNum + "&" + "cardImgFront=" + requestModel.cardImgFront
+                + "&" + "cardImgBack=" + requestModel.cardImgBack + "&" + "phoneNum=" + requestModel.phoneNum
+                + "&" + "bankCard=" + requestModel.bankCard;
+
+        checkSign = MD5Util.encryption(checkSign);
+        if (!requestModel.sign.equals(checkSign)){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+
+    /**
+    * @Description: 组装要添加的众邦白名单数据
+    * @param requestModel
+    * @author: yoko
+    * @date: 2022/7/7 16:01
+    * @version 1.0.0
+    */
+    public static ZbWhitelistModel assembleZbWhitelistAdd(RequestWhitelist requestModel) throws Exception{
+        ZbWhitelistModel resBean = new ZbWhitelistModel();
+        resBean = BeanUtils.copy(requestModel, ZbWhitelistModel.class);
+        resBean.setTrxId(DateUtil.getNowPlusTimeMill());
+        resBean.setSerialNo(String.valueOf(System.currentTimeMillis()));
         return resBean;
     }
 
